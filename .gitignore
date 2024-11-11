@@ -1,0 +1,14 @@
+#Plataform folder
+jesd204b/
+
+#Aplication folder
+app_system/
+app/_ide
+
+#Eclise configuration folder
+.metadata
+*.analytics
+*.project
+*.log
+*.cproject
+*.prj
