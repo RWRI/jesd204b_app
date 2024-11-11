@@ -139,7 +139,7 @@ int main(void)
 // setup the base addresses
 //******************************************************************************
 
-#define XPAR_JESD204B_PHY_SHARED_AXI_AD9144_XCVR_BASEADDR XPAR_JESD204B_PHY_SHARED_0_BASEADDR
+#define XPAR_JESD204B_PHY_SHARED_AXI_AD9144_XCVR_BASEADDR XPAR_JESD204B_PHY_SHARED_BASEADDR
 #define XPAR_JESD204B_PHY_SHARED_AXI_AD9680_XCVR_BASEADDR 0xA0000000 //0xA0010000
 
 #ifdef XILINX
@@ -448,7 +448,7 @@ int main(void)
  	dac_data_setup(&ad9144_core);
 
  	//value of ceil
-	*((uint32_t *)(XPAR_JESD204B_DAC_AXI_GPIO_0_BASEADDR + 0x8)) = 3750000;
+	*((uint32_t *)(XPAR_JESD204B_DAC_AXI_GPIO_COUNTER_BASEADDR + 0x8)) = 3750000;
 
 	if(!dmac_start_transaction_direct_register_mode(ad9144_dma)) {
 		printf("daq2: transmitting data from memory\n");
@@ -466,7 +466,7 @@ int main(void)
 
 	while(1){
 		transmit_receive(ad9144_dma, ad9680_dma);
-		while(!*((uint32_t *)(XPAR_JESD204B_DAC_AXI_GPIO_0_BASEADDR)));
+		while(!*((uint32_t *)(XPAR_JESD204B_DAC_AXI_GPIO_COUNTER_BASEADDR)));
 	}
 
  #else
