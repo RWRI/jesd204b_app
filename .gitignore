@@ -1,5 +1,7 @@
 #Plataform folder
 jesd204b/
+fsbl_system/
+fsbl/
 
 #Aplication folder
 app_system/
