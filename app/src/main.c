@@ -16,7 +16,6 @@ int main() {
 		mode = ((int) inputOption) - 48;
 		if (mode < 0 || mode >= END_MODE)
 			mode = 0;
-		printf("mode:%d\n", mode);
 
 		init_jesd204b(qntAmostras, mode);
 

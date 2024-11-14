@@ -158,11 +158,11 @@ int init_jesd204b(int qntAmostras, tmode mode) {
 	XPAR_JESD204B_ADC_AXI_AD9680_DMA_AXI_DMAC_BASEADDR;
 
 	if (mode == ADC_DAC) {
-		rx_xfer.start_address = XPAR_DDR_MEM_BASEADDR + 0x800000;
-		tx_xfer.start_address = XPAR_DDR_MEM_BASEADDR + 0x800000;
+		rx_xfer.start_address = XPAR_DDR_MEM_BASEADDR + 0x0;
+		tx_xfer.start_address = XPAR_DDR_MEM_BASEADDR + 0x0;
 	} else {
-		rx_xfer.start_address = XPAR_DDR_MEM_BASEADDR + 0x800000;
-		tx_xfer.start_address = XPAR_DDR_MEM_BASEADDR + 0xA00000;
+		rx_xfer.start_address = XPAR_DDR_MEM_BASEADDR + 0x40000;
+		tx_xfer.start_address = XPAR_DDR_MEM_BASEADDR + 0x10000000;
 	}
 
 //******************************************************************************
