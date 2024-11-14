@@ -53,26 +53,16 @@ struct ad9144_jesd204_link_mode {
 };
 
 static const struct ad9144_jesd204_link_mode ad9144_jesd204_link_modes[] = {
-	/* ID, M, L, F, S */
-	{  0, 4, 8, 1, 1 },
-	{  1, 4, 8, 2, 2 },
-	{  2, 4, 4, 1, 2 },
-	{  3, 4, 2, 1, 4 },
-	{  4, 2, 4, 1, 1 },
-	{  5, 2, 4, 2, 2 },
-	{  6, 2, 2, 1, 2 },
-	{  7, 1, 1, 1, 4 },
-	{  9, 1, 2, 1, 1 },
-	{ 10, 1, 1, 1, 2 },
-};
+/* ID, M, L, F, S */
+{ 0, 4, 8, 1, 1 }, { 1, 4, 8, 2, 2 }, { 2, 4, 4, 1, 2 }, { 3, 4, 2, 1, 4 }, { 4,
+		2, 4, 1, 1 }, { 5, 2, 4, 2, 2 }, { 6, 2, 2, 1, 2 }, { 7, 1, 1, 1, 4 }, {
+		9, 1, 2, 1, 1 }, { 10, 1, 1, 1, 2 }, };
 
 /***************************************************************************//**
  * @brief ad9144_spi_read
  *******************************************************************************/
-int32_t ad9144_spi_read(struct ad9144_dev *dev,
-			uint16_t reg_addr,
-			uint8_t *reg_data)
-{
+int32_t ad9144_spi_read(struct ad9144_dev *dev, uint16_t reg_addr,
+		uint8_t *reg_data) {
 	uint8_t buf[3];
 
 	int32_t ret;
@@ -81,9 +71,7 @@ int32_t ad9144_spi_read(struct ad9144_dev *dev,
 	buf[1] = reg_addr & 0xFF;
 	buf[2] = 0x00;
 
-	ret = spi_write_and_read(dev->spi_desc,
-				 buf,
-				 3);
+	ret = spi_write_and_read(dev->spi_desc, buf, 3);
 	*reg_data = buf[2];
 
 	return ret;
@@ -92,10 +80,8 @@ int32_t ad9144_spi_read(struct ad9144_dev *dev,
 /***************************************************************************//**
  * @brief ad9144_spi_write
  *******************************************************************************/
-int32_t ad9144_spi_write(struct ad9144_dev *dev,
-			 uint16_t reg_addr,
-			 uint8_t reg_data)
-{
+int32_t ad9144_spi_write(struct ad9144_dev *dev, uint16_t reg_addr,
+		uint8_t reg_data) {
 	uint8_t buf[3];
 
 	int32_t ret;
@@ -104,9 +90,7 @@ int32_t ad9144_spi_write(struct ad9144_dev *dev,
 	buf[1] = reg_addr & 0xFF;
 	buf[2] = reg_data;
 
-	ret = spi_write_and_read(dev->spi_desc,
-				 buf,
-				 3);
+	ret = spi_write_and_read(dev->spi_desc, buf, 3);
 
 	return ret;
 }
@@ -114,11 +98,8 @@ int32_t ad9144_spi_write(struct ad9144_dev *dev,
 /***************************************************************************//**
  * @brief ad9144_spi_check_status
  *******************************************************************************/
-int32_t ad9144_spi_check_status(struct ad9144_dev *dev,
-				uint16_t reg_addr,
-				uint8_t reg_mask,
-				uint8_t exp_reg_data)
-{
+int32_t ad9144_spi_check_status(struct ad9144_dev *dev, uint16_t reg_addr,
+		uint8_t reg_mask, uint8_t exp_reg_data) {
 	uint16_t timeout = 0;
 	uint8_t status = 0;
 	do {
@@ -129,7 +110,7 @@ int32_t ad9144_spi_check_status(struct ad9144_dev *dev,
 			timeout++;
 			mdelay(1);
 		}
-	} while(timeout < 100);
+	} while (timeout < 100);
 
 	return -1;
 }
@@ -140,8 +121,7 @@ struct ad9144_reg_seq {
 };
 
 int32_t ad9144_spi_write_seq(struct ad9144_dev *dev,
-			     const struct ad9144_reg_seq *seq, uint32_t num)
-{
+		const struct ad9144_reg_seq *seq, uint32_t num) {
 	int32_t ret = 0;
 
 	while (num) {
@@ -157,38 +137,21 @@ int32_t ad9144_spi_write_seq(struct ad9144_dev *dev,
  * Required device configuration as per table 16 from the AD9144
  * datasheet Rev B.
  */
-static const struct ad9144_reg_seq ad9144_required_device_config[] = {
-	{ 0x12d, 0x8b },
-	{ 0x146, 0x01 },
-	{ 0x2a4, 0xff },
-	{ 0x232, 0xff },
-	{ 0x333, 0x01 },
-};
+static const struct ad9144_reg_seq ad9144_required_device_config[] = { { 0x12d,
+		0x8b }, { 0x146, 0x01 }, { 0x2a4, 0xff }, { 0x232, 0xff },
+		{ 0x333, 0x01 }, };
 
 /*
  * Optimal settings for the SERDES PLL, as per table 39 of the AD9144 datasheet.
  */
-static const struct ad9144_reg_seq ad9144_optimal_serdes_settings[] = {
-	{ 0x284, 0x62 },
-	{ 0x285, 0xc9 },
-	{ 0x286, 0x0e },
-	{ 0x287, 0x12 },
-	{ 0x28a, 0x7b },
-	{ 0x28b, 0x00 },
-	{ 0x290, 0x89 },
-	{ 0x294, 0x24 },
-	{ 0x296, 0x03 },
-	{ 0x297, 0x0d },
-	{ 0x299, 0x02 },
-	{ 0x29a, 0x8e },
-	{ 0x29c, 0x2a },
-	{ 0x29f, 0x78 },
-	{ 0x2a0, 0x06 },
-};
+static const struct ad9144_reg_seq ad9144_optimal_serdes_settings[] = { { 0x284,
+		0x62 }, { 0x285, 0xc9 }, { 0x286, 0x0e }, { 0x287, 0x12 },
+		{ 0x28a, 0x7b }, { 0x28b, 0x00 }, { 0x290, 0x89 }, { 0x294, 0x24 }, {
+				0x296, 0x03 }, { 0x297, 0x0d }, { 0x299, 0x02 },
+		{ 0x29a, 0x8e }, { 0x29c, 0x2a }, { 0x29f, 0x78 }, { 0x2a0, 0x06 }, };
 
 int32_t ad9144_setup_jesd204_link(struct ad9144_dev *dev,
-				  const struct ad9144_init_param *init_param)
-{
+		const struct ad9144_init_param *init_param) {
 	const struct ad9144_jesd204_link_mode *link_mode = NULL;
 	unsigned int lane_mask;
 	unsigned int val;
@@ -272,25 +235,14 @@ int32_t ad9144_setup_jesd204_link(struct ad9144_dev *dev,
  * PLL fixed register writes according to table 17 of the
  * AD9144 datasheet Rev. B.
  */
-static const struct ad9144_reg_seq ad9144_pll_fixed_writes[] = {
-	{ 0x87, 0x62 },
-	{ 0x88, 0xc0 },
-	{ 0x89, 0x0e },
-	{ 0x8a, 0x12 },
-	{ 0x8d, 0x7b },
-	{ 0x1b0, 0x00 },
-	{ 0x1b9, 0x24 },
-	{ 0x1bc, 0x0d },
-	{ 0x1be, 0x02 },
-	{ 0x1bf, 0x8e },
-	{ 0x1c0, 0x2a },
-	{ 0x1c1, 0x2a },
-	{ 0x1c4, 0x7e },
-};
+static const struct ad9144_reg_seq ad9144_pll_fixed_writes[] =
+		{ { 0x87, 0x62 }, { 0x88, 0xc0 }, { 0x89, 0x0e }, { 0x8a, 0x12 }, {
+				0x8d, 0x7b }, { 0x1b0, 0x00 }, { 0x1b9, 0x24 }, { 0x1bc, 0x0d },
+				{ 0x1be, 0x02 }, { 0x1bf, 0x8e }, { 0x1c0, 0x2a },
+				{ 0x1c1, 0x2a }, { 0x1c4, 0x7e }, };
 
 static int32_t ad9144_pll_setup(struct ad9144_dev *dev,
-				const struct ad9144_init_param *init_param)
-{
+		const struct ad9144_init_param *init_param) {
 	uint32_t fref, fdac;
 	uint32_t lo_div_mode;
 	uint32_t ref_div_mode = 0;
@@ -342,7 +294,7 @@ static int32_t ad9144_pll_setup(struct ad9144_dev *dev,
 	}
 
 	ad9144_spi_write_seq(dev, ad9144_pll_fixed_writes,
-			     ARRAY_SIZE(ad9144_pll_fixed_writes));
+			ARRAY_SIZE(ad9144_pll_fixed_writes));
 
 	ad9144_spi_write(dev, REG_DACLOGENCNTRL, lo_div_mode);
 	ad9144_spi_write(dev, REG_DACLDOCNTRL1, ref_div_mode);
@@ -355,9 +307,9 @@ static int32_t ad9144_pll_setup(struct ad9144_dev *dev,
 	ad9144_spi_write(dev, REG_DACPLLCNTRL, 0x10);
 
 	ret = ad9144_spi_check_status(dev, REG_DACPLLSTATUS, 0x22, 0x22);
-	if (ret == -1){
+	if (ret == -1) {
 		printf("\r%s : DAC PLL NOT locked!.\n", __func__);
-	}else{
+	} else {
 		printf("\r%s : DAC PLL is locked. Everything OK!.\n", __func__);
 	}
 
@@ -366,10 +318,9 @@ static int32_t ad9144_pll_setup(struct ad9144_dev *dev,
 
 /***************************************************************************//**
  * @brief ad9144_setup
-********************************************************************************/
+ ********************************************************************************/
 int32_t ad9144_setup(struct ad9144_dev **device,
-		     const struct ad9144_init_param *init_param)
-{
+		const struct ad9144_init_param *init_param) {
 	uint32_t serdes_plldiv;
 	uint32_t serdes_cdr;
 	uint8_t chip_id;
@@ -378,7 +329,7 @@ int32_t ad9144_setup(struct ad9144_dev **device,
 	int32_t ret;
 	struct ad9144_dev *dev;
 
-	dev = (struct ad9144_dev *)malloc(sizeof(*dev));
+	dev = (struct ad9144_dev *) malloc(sizeof(*dev));
 	if (!dev)
 		return -1;
 
@@ -389,20 +340,21 @@ int32_t ad9144_setup(struct ad9144_dev **device,
 
 	// reset
 	ad9144_spi_write(dev, REG_SPI_INTFCONFA, SOFTRESET_M | SOFTRESET);
-	ad9144_spi_write(dev, REG_SPI_INTFCONFA, init_param->spi3wire ? 0x00 : 0x18);
+	ad9144_spi_write(dev, REG_SPI_INTFCONFA,
+			init_param->spi3wire ? 0x00 : 0x18);
 	mdelay(1);
 
 	ad9144_spi_read(dev, REG_SPI_PRODIDL, &chip_id);
-	if(chip_id != AD9144_CHIP_ID) {
+	if (chip_id != AD9144_CHIP_ID) {
 		printf("\r%s : Invalid CHIP ID (0x%x).\n", __func__, chip_id);
 		return -1;
 	}
 
 	ad9144_spi_write(dev, REG_SPI_SCRATCHPAD, 0xAD);
 	ad9144_spi_read(dev, REG_SPI_SCRATCHPAD, &scratchpad);
-	if(scratchpad != 0xAD) {
+	if (scratchpad != 0xAD) {
 		printf("\r%s : scratchpad read-write failed (0x%x)!\n", __func__,
-		       scratchpad);
+				scratchpad);
 		return -1;
 	}
 
@@ -412,8 +364,10 @@ int32_t ad9144_setup(struct ad9144_dev **device,
 	ad9144_spi_write(dev, REG_SYSREF_ACTRL0, 0x00);	// sysref - power up/falling edge
 
 	// required device configurations
-	ad9144_spi_write_seq(dev, ad9144_required_device_config, ARRAY_SIZE(ad9144_required_device_config));
-	ad9144_spi_write_seq(dev, ad9144_optimal_serdes_settings, ARRAY_SIZE(ad9144_optimal_serdes_settings));
+	ad9144_spi_write_seq(dev, ad9144_required_device_config,
+			ARRAY_SIZE(ad9144_required_device_config));
+	ad9144_spi_write_seq(dev, ad9144_optimal_serdes_settings,
+			ARRAY_SIZE(ad9144_optimal_serdes_settings));
 
 	if (init_param->pll_enable)
 		ad9144_pll_setup(dev, init_param);
@@ -421,18 +375,18 @@ int32_t ad9144_setup(struct ad9144_dev **device,
 	// digital data path
 
 	switch (init_param->interpolation) {
-		case 2:
-			val = 0x01;
-			break;
-		case 4:
-			val = 0x03;
-			break;
-		case 8:
-			val = 0x04;
-			break;
-		default:
-			val = 0x00;
-			break;
+	case 2:
+		val = 0x01;
+		break;
+	case 4:
+		val = 0x03;
+		break;
+	case 8:
+		val = 0x04;
+		break;
+	default:
+		val = 0x00;
+		break;
 	}
 
 	ad9144_spi_write(dev, REG_INTERP_MODE, val);
@@ -442,7 +396,7 @@ int32_t ad9144_setup(struct ad9144_dev **device,
 
 	ad9144_spi_write(dev, REG_MASTER_PD, 0x00);	// phy - power up
 	ad9144_spi_write(dev, REG_PHY_PD, 0x00);	// phy - power up
-	ad9144_spi_write(dev, REG_GENERAL_JRX_CTRL_0, 0x00);	// single link - link 0
+	ad9144_spi_write(dev, REG_GENERAL_JRX_CTRL_0, 0x00);// single link - link 0
 	ad9144_setup_jesd204_link(dev, init_param);
 
 	// physical layer
@@ -462,15 +416,15 @@ int32_t ad9144_setup(struct ad9144_dev **device,
 	ad9144_spi_write(dev, REG_DEV_CONFIG_10, 0x87);		// jesd termination
 	ad9144_spi_write(dev, REG_DEV_CONFIG_11, 0xb7);		// jesd termination
 	ad9144_spi_write(dev, REG_DEV_CONFIG_12, 0x87);		// jesd termination
-	ad9144_spi_write(dev, REG_TERM_BLK1_CTRLREG0, 0x01);	// input termination calibration
-	ad9144_spi_write(dev, REG_TERM_BLK2_CTRLREG0, 0x01);	// input termination calibration
-	ad9144_spi_write(dev, REG_SERDES_SPI_REG, 0x01);	// pclk == qbd master clock
+	ad9144_spi_write(dev, REG_TERM_BLK1_CTRLREG0, 0x01);// input termination calibration
+	ad9144_spi_write(dev, REG_TERM_BLK2_CTRLREG0, 0x01);// input termination calibration
+	ad9144_spi_write(dev, REG_SERDES_SPI_REG, 0x01);// pclk == qbd master clock
 	ad9144_spi_write(dev, REG_CDR_OPERATING_MODE_REG_0, serdes_cdr);
 	ad9144_spi_write(dev, REG_CDR_RESET, 0x00);	// cdr reset
 	ad9144_spi_write(dev, REG_CDR_RESET, 0x01);	// cdr reset
 	ad9144_spi_write(dev, REG_REF_CLK_DIVIDER_LDO, serdes_plldiv);
 	ad9144_spi_write(dev, REG_SYNTH_ENABLE_CNTRL, 0x01);	// enable serdes pll
-	ad9144_spi_write(dev, REG_SYNTH_ENABLE_CNTRL, 0x05);	// enable serdes calibration
+	ad9144_spi_write(dev, REG_SYNTH_ENABLE_CNTRL, 0x05);// enable serdes calibration
 	mdelay(20);
 
 	ret = ad9144_spi_check_status(dev, REG_PLL_STATUS, 0x01, 0x01);
@@ -478,7 +432,6 @@ int32_t ad9144_setup(struct ad9144_dev **device,
 		printf("\r%s : PLL NOT locked!.\n", __func__);
 	else
 		printf("\rAD9144: PLL is locked! Everything OK\n");
-
 
 	ad9144_spi_write(dev, REG_EQ_BIAS_REG, 0x62);	// equalizer
 
@@ -492,10 +445,18 @@ int32_t ad9144_setup(struct ad9144_dev **device,
 	ad9144_spi_write(dev, REG_SYNC_CTRL, 0x01);	// sync-oneshot mode
 	ad9144_spi_write(dev, REG_SYNC_CTRL, 0x81);	// sync-enable
 	ad9144_spi_write(dev, REG_SYNC_CTRL, 0xc1);	// sysref-armed
-	ad9144_spi_write(dev, REG_XBAR_LN_0_1, SRC_LANE0(init_param->jesd204_lane_xbar[0]) | SRC_LANE1(init_param->jesd204_lane_xbar[1]));
-	ad9144_spi_write(dev, REG_XBAR_LN_2_3, SRC_LANE2(init_param->jesd204_lane_xbar[2]) | SRC_LANE3(init_param->jesd204_lane_xbar[3]));
-	ad9144_spi_write(dev, REG_XBAR_LN_4_5, SRC_LANE4(init_param->jesd204_lane_xbar[4]) | SRC_LANE5(init_param->jesd204_lane_xbar[5]));
-	ad9144_spi_write(dev, REG_XBAR_LN_6_7, SRC_LANE6(init_param->jesd204_lane_xbar[6]) | SRC_LANE7(init_param->jesd204_lane_xbar[7]));
+	ad9144_spi_write(dev, REG_XBAR_LN_0_1,
+			SRC_LANE0(
+					init_param->jesd204_lane_xbar[0]) | SRC_LANE1(init_param->jesd204_lane_xbar[1]));
+	ad9144_spi_write(dev, REG_XBAR_LN_2_3,
+			SRC_LANE2(
+					init_param->jesd204_lane_xbar[2]) | SRC_LANE3(init_param->jesd204_lane_xbar[3]));
+	ad9144_spi_write(dev, REG_XBAR_LN_4_5,
+			SRC_LANE4(
+					init_param->jesd204_lane_xbar[4]) | SRC_LANE5(init_param->jesd204_lane_xbar[5]));
+	ad9144_spi_write(dev, REG_XBAR_LN_6_7,
+			SRC_LANE6(
+					init_param->jesd204_lane_xbar[6]) | SRC_LANE7(init_param->jesd204_lane_xbar[7]));
 	ad9144_spi_write(dev, REG_GENERAL_JRX_CTRL_0, 0x01);	// enable link
 
 	// dac calibration
@@ -506,8 +467,7 @@ int32_t ad9144_setup(struct ad9144_dev **device,
 	return ret;
 }
 
-int32_t ad9144_dac_calibrate(struct ad9144_dev *dev)
-{
+int32_t ad9144_dac_calibrate(struct ad9144_dev *dev) {
 	uint32_t dac_mask;
 	unsigned int i;
 	int ret;
@@ -517,8 +477,8 @@ int32_t ad9144_dac_calibrate(struct ad9144_dev *dev)
 	/*
 	 * DAC calibration sequence as per table 86 AD9144 datasheet Rev B.
 	 */
-	ad9144_spi_write(dev, REG_CAL_CLKDIV, 0x38);	// set calibration clock to 1m
-	ad9144_spi_write(dev, REG_CAL_INIT, 0xa6);	// use isb reference of 38 to set cal
+	ad9144_spi_write(dev, REG_CAL_CLKDIV, 0x38);// set calibration clock to 1m
+	ad9144_spi_write(dev, REG_CAL_INIT, 0xa6);// use isb reference of 38 to set cal
 	ad9144_spi_write(dev, REG_CAL_INDX, dac_mask);	// select all active DACs
 	ad9144_spi_write(dev, REG_CAL_CTRL, 0x01);	// single cal enable
 	ad9144_spi_write(dev, REG_CAL_CTRL, 0x03);	// single cal start
@@ -543,9 +503,8 @@ int32_t ad9144_dac_calibrate(struct ad9144_dev *dev)
  * @param dev - The device structure.
  *
  * @return SUCCESS in case of success, negative error code otherwise.
-*******************************************************************************/
-int32_t ad9144_remove(struct ad9144_dev *dev)
-{
+ *******************************************************************************/
+int32_t ad9144_remove(struct ad9144_dev *dev) {
 	int32_t ret;
 
 	ret = spi_remove(dev->spi_desc);
@@ -558,8 +517,7 @@ int32_t ad9144_remove(struct ad9144_dev *dev)
 /***************************************************************************//**
  * @brief ad9144_status - return the status of the JESD interface
  *******************************************************************************/
-int32_t ad9144_status(struct ad9144_dev *dev)
-{
+int32_t ad9144_status(struct ad9144_dev *dev) {
 
 	uint8_t status = 0;
 	int32_t ret = 0;
@@ -591,7 +549,7 @@ int32_t ad9144_status(struct ad9144_dev *dev)
 		ret = -1;
 	}
 
-	if(ret != -1){
+	if (ret != -1) {
 		printf("\r%s : No problems with AD9144!\n", __func__);
 	}
 
@@ -602,8 +560,7 @@ int32_t ad9144_status(struct ad9144_dev *dev)
  * @brief ad9144_short_pattern_test
  *******************************************************************************/
 int32_t ad9144_short_pattern_test(struct ad9144_dev *dev,
-				  const struct ad9144_init_param *init_param)
-{
+		const struct ad9144_init_param *init_param) {
 
 	uint32_t dac = 0;
 	uint32_t sample = 0;
@@ -612,20 +569,29 @@ int32_t ad9144_short_pattern_test(struct ad9144_dev *dev,
 
 	for (dac = 0; dac < dev->num_converters; dac++) {
 		for (sample = 0; sample < 4; sample++) {
-			ad9144_spi_write(dev, REG_SHORT_TPL_TEST_0, ((sample << 4) | (dac << 2) | 0x00));
-			ad9144_spi_write(dev, REG_SHORT_TPL_TEST_2, (init_param->stpl_samples[dac][sample]>>8));
-			ad9144_spi_write(dev, REG_SHORT_TPL_TEST_1, (init_param->stpl_samples[dac][sample]>>0));
-			ad9144_spi_write(dev, REG_SHORT_TPL_TEST_0, ((sample << 4) | (dac << 2) | 0x01));
-			ad9144_spi_write(dev, REG_SHORT_TPL_TEST_0, ((sample << 4) | (dac << 2) | 0x03));
-			ad9144_spi_write(dev, REG_SHORT_TPL_TEST_0, ((sample << 4) | (dac << 2) | 0x01));
+			ad9144_spi_write(dev, REG_SHORT_TPL_TEST_0,
+					((sample << 4) | (dac << 2) | 0x00));
+			ad9144_spi_write(dev, REG_SHORT_TPL_TEST_2,
+					(init_param->stpl_samples[dac][sample] >> 8));
+			ad9144_spi_write(dev, REG_SHORT_TPL_TEST_1,
+					(init_param->stpl_samples[dac][sample] >> 0));
+			ad9144_spi_write(dev, REG_SHORT_TPL_TEST_0,
+					((sample << 4) | (dac << 2) | 0x01));
+			ad9144_spi_write(dev, REG_SHORT_TPL_TEST_0,
+					((sample << 4) | (dac << 2) | 0x03));
+			ad9144_spi_write(dev, REG_SHORT_TPL_TEST_0,
+					((sample << 4) | (dac << 2) | 0x01));
 
-			ret = ad9144_spi_check_status(dev,REG_SHORT_TPL_TEST_3, 0x01, 0x00);
+			ret = ad9144_spi_check_status(dev, REG_SHORT_TPL_TEST_3, 0x01,
+					0x00);
 			if (ret == -1)
-				printf("\r%s : short-pattern-test mismatch (0x%x, 0x%x, 0x%x, 0x%x)!.\n",
-				       __func__, dac, sample,init_param->stpl_samples[dac][sample],status);
+				printf(
+						"\r%s : short-pattern-test mismatch (0x%x, 0x%x, 0x%x, 0x%x)!.\n",
+						__func__, dac, sample,
+						init_param->stpl_samples[dac][sample], status);
 		}
 	}
-	if(ret != -1){
+	if (ret != -1) {
 		printf("\r%s : all tests OK!.\n", __func__);
 	}
 
@@ -636,12 +602,10 @@ int32_t ad9144_short_pattern_test(struct ad9144_dev *dev,
  * @brief ad9144_datapath_prbs_test
  *******************************************************************************/
 int32_t ad9144_datapath_prbs_test(struct ad9144_dev *dev,
-				  const struct ad9144_init_param *init_param)
-{
+		const struct ad9144_init_param *init_param) {
 
 	uint8_t status = 0;
 	int32_t ret = 0;
-
 
 	ad9144_spi_write(dev, REG_PRBS, ((init_param->prbs_type << 2) | 0x03));
 	ad9144_spi_write(dev, REG_PRBS, ((init_param->prbs_type << 2) | 0x01));
@@ -655,18 +619,16 @@ int32_t ad9144_datapath_prbs_test(struct ad9144_dev *dev,
 	}
 	ad9144_spi_read(dev, REG_PRBS_ERROR_I, &status);
 	if (status != 0x00) {
-		printf("\r%s : PRBS I channel ERRORS (%x)!.\n", __func__,
-		       status);
+		printf("\r%s : PRBS I channel ERRORS (%x)!.\n", __func__, status);
 		ret = -1;
 	}
 	ad9144_spi_read(dev, REG_PRBS_ERROR_Q, &status);
 	if (status != 0x00) {
-		printf("\r%s : PRBS Q channel ERRORS (%x)!.\n", __func__,
-		       status);
+		printf("\r%s : PRBS Q channel ERRORS (%x)!.\n", __func__, status);
 		ret = -1;
 	}
 
-	if(ret != -1){
+	if (ret != -1) {
 		printf("\r%s : all tests OK!.\n", __func__);
 	}
 

@@ -2,7 +2,7 @@
  *   @file   platform_drivers.c
  *   @brief  Implementation of Generic Platform Drivers.
  *   @author DBogdan (dragos.bogdan@analog.com)
-********************************************************************************
+ ********************************************************************************
  * Copyright 2017(c) Analog Devices, Inc.
  *
  * All rights reserved.
@@ -35,7 +35,7 @@
  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************/
+ *******************************************************************************/
 
 /******************************************************************************/
 /***************************** Include Files **********************************/
@@ -46,8 +46,8 @@
 /*************************** Global variables *********************************/
 /******************************************************************************/
 #ifdef ZYNQ
-XSpiPs  m_spi;
-XSpiPs_Config  *m_spi_config;
+XSpiPs m_spi;
+XSpiPs_Config *m_spi_config;
 #endif
 
 /******************************************************************************/
@@ -60,9 +60,7 @@ XSpiPs_Config  *m_spi_config;
  * @param init_param - The structure that contains the I2C parameters.
  * @return SUCCESS in case of success, FAILURE otherwise.
  */
-int32_t i2c_init(i2c_desc **desc,
-		 const i2c_init_param *param)
-{
+int32_t i2c_init(i2c_desc **desc, const i2c_init_param *param) {
 	if (desc) {
 		// Unused variable - fix compiler warning
 	}
@@ -79,8 +77,7 @@ int32_t i2c_init(i2c_desc **desc,
  * @param desc - The I2C descriptor.
  * @return SUCCESS in case of success, FAILURE otherwise.
  */
-int32_t i2c_remove(i2c_desc *desc)
-{
+int32_t i2c_remove(i2c_desc *desc) {
 	if (desc) {
 		// Unused variable - fix compiler warning
 	}
@@ -98,11 +95,8 @@ int32_t i2c_remove(i2c_desc *desc)
  *                            1 - A stop condition will be generated.
  * @return SUCCESS in case of success, FAILURE otherwise.
  */
-int32_t i2c_write(i2c_desc *desc,
-		  uint8_t *data,
-		  uint8_t bytes_number,
-		  uint8_t stop_bit)
-{
+int32_t i2c_write(i2c_desc *desc, uint8_t *data, uint8_t bytes_number,
+		uint8_t stop_bit) {
 	if (desc) {
 		// Unused variable - fix compiler warning
 	}
@@ -132,11 +126,8 @@ int32_t i2c_write(i2c_desc *desc,
  *                            1 - A stop condition will be generated.
  * @return SUCCESS in case of success, FAILURE otherwise.
  */
-int32_t i2c_read(i2c_desc *desc,
-		 uint8_t *data,
-		 uint8_t bytes_number,
-		 uint8_t stop_bit)
-{
+int32_t i2c_read(i2c_desc *desc, uint8_t *data, uint8_t bytes_number,
+		uint8_t stop_bit) {
 	if (desc) {
 		// Unused variable - fix compiler warning
 	}
@@ -162,24 +153,22 @@ int32_t i2c_read(i2c_desc *desc,
  * @param init_param - The structure that contains the SPI parameters.
  * @return SUCCESS in case of success, FAILURE otherwise.
  */
-int32_t spi_init(spi_desc **desc,
-		 const spi_init_param *param)
-{
+int32_t spi_init(spi_desc **desc, const spi_init_param *param) {
 	spi_desc *dev;
 
-	dev = (spi_desc *)malloc(sizeof(*dev));
+	dev = (spi_desc *) malloc(sizeof(*dev));
 	if (!dev)
 		return FAILURE;
 
 	dev->type = param->type;
 	dev->id = 0;
 
-	switch(dev->type) {
+	switch (dev->type) {
 #ifdef ZYNQ_PS7
 	case ZYNQ_PS7_SPI:
-		dev->base_address = XPAR_PS7_SPI_0_BASEADDR;
-		dev->device_id = XPAR_PS7_SPI_0_DEVICE_ID;
-		break;
+	dev->base_address = XPAR_PS7_SPI_0_BASEADDR;
+	dev->device_id = XPAR_PS7_SPI_0_DEVICE_ID;
+	break;
 #endif
 #ifdef ZYNQ_PSU
 	case ZYNQ_PSU_SPI:
@@ -188,12 +177,12 @@ int32_t spi_init(spi_desc **desc,
 		break;
 #endif
 #ifdef MICROBLAZE
-	case MICROBLAZE_SPI:
+		case MICROBLAZE_SPI:
 		dev->base_address = XPAR_SPI_0_BASEADDR;
 		break;
 #endif
 #ifdef NIOS_II
-	case NIOS_II_SPI:
+		case NIOS_II_SPI:
 		dev->base_address = SYS_SPI_BASE;
 		break;
 #endif
@@ -214,8 +203,8 @@ int32_t spi_init(spi_desc **desc,
 		return FAILURE;
 	}
 
-	if (XSpiPs_CfgInitialize(&m_spi, m_spi_config,
-				 m_spi_config->BaseAddress) != 0) {
+	if (XSpiPs_CfgInitialize(&m_spi, m_spi_config, m_spi_config->BaseAddress)
+			!= 0) {
 		free(dev);
 		return FAILURE;
 	}
@@ -231,8 +220,7 @@ int32_t spi_init(spi_desc **desc,
  * @param desc - The SPI descriptor.
  * @return SUCCESS in case of success, FAILURE otherwise.
  */
-int32_t spi_remove(spi_desc *desc)
-{
+int32_t spi_remove(spi_desc *desc) {
 	free(desc);
 
 	return SUCCESS;
@@ -245,27 +233,25 @@ int32_t spi_remove(spi_desc *desc)
  * @param bytes_number - Number of bytes to write/read.
  * @return SUCCESS in case of success, FAILURE otherwise.
  */
-int32_t spi_write_and_read(spi_desc *desc,
-			   uint8_t *data,
-			   uint8_t bytes_number)
-{
+int32_t spi_write_and_read(spi_desc *desc, uint8_t *data, uint8_t bytes_number) {
 #ifdef ZYNQ
 
 	uint32_t initss;
 
 	initss = XSpiPs_ReadReg(desc->base_address, XSPIPS_CR_OFFSET);
-	initss = initss & (uint32_t)(~XSPIPS_CR_SSCTRL_MASK);
+	initss = initss & (uint32_t) (~XSPIPS_CR_SSCTRL_MASK);
 	initss = initss | (0x7 << XSPIPS_CR_SSCTRL_SHIFT);
 	XSpiPs_WriteReg(desc->base_address, XSPIPS_CR_OFFSET, initss);
-	XSpiPs_SetOptions(&m_spi, XSPIPS_MASTER_OPTION |
-			  XSPIPS_DECODE_SSELECT_OPTION | XSPIPS_FORCE_SSELECT_OPTION |
-			  ((desc->cpol == 1) ? XSPIPS_CLK_ACTIVE_LOW_OPTION : 0) |
-			  ((desc->cpha == 1) ? XSPIPS_CLK_PHASE_1_OPTION : 0));
-	XSpiPs_SetSlaveSelect(&m_spi,  (uint8_t) 0x7);
+	XSpiPs_SetOptions(&m_spi,
+			XSPIPS_MASTER_OPTION |
+			XSPIPS_DECODE_SSELECT_OPTION | XSPIPS_FORCE_SSELECT_OPTION
+					| ((desc->cpol == 1) ? XSPIPS_CLK_ACTIVE_LOW_OPTION : 0)
+					| ((desc->cpha == 1) ? XSPIPS_CLK_PHASE_1_OPTION : 0));
+	XSpiPs_SetSlaveSelect(&m_spi, (uint8_t) 0x7);
 	XSpiPs_SetClkPrescaler(&m_spi, XSPIPS_CLK_PRESCALE_64);
-	XSpiPs_SetSlaveSelect(&m_spi,  (uint8_t) (desc->chip_select & 0x7));
+	XSpiPs_SetSlaveSelect(&m_spi, (uint8_t) (desc->chip_select & 0x7));
 	XSpiPs_PolledTransfer(&m_spi, data, data, bytes_number);
-	XSpiPs_SetSlaveSelect(&m_spi,  (uint8_t) 0x7);
+	XSpiPs_SetSlaveSelect(&m_spi, (uint8_t) 0x7);
 
 #endif
 
@@ -292,7 +278,7 @@ int32_t spi_write_and_read(spi_desc *desc,
 
 	Xil_Out32((desc->base_address + 0x70), desc->chip_select);
 	Xil_Out32((desc->base_address + 0x60),
-		  (0x086 | (desc->cpol<<3) | (desc->cpha<<4)));
+			(0x086 | (desc->cpol<<3) | (desc->cpha<<4)));
 	for (i = 0; i < bytes_number; i++) {
 		Xil_Out32((desc->base_address + 0x68), *(data + i));
 		while ((Xil_In32(desc->base_address + 0x64) & 0x1) == 0x1) {}
@@ -300,7 +286,7 @@ int32_t spi_write_and_read(spi_desc *desc,
 	}
 	Xil_Out32((desc->base_address + 0x70), 0xff);
 	Xil_Out32((desc->base_address + 0x60),
-		  (0x186 | (desc->cpol<<3) | (desc->cpha<<4)));
+			(0x186 | (desc->cpol<<3) | (desc->cpha<<4)));
 
 #endif
 
@@ -313,20 +299,18 @@ int32_t spi_write_and_read(spi_desc *desc,
  * @param gpio_number - The number of the GPIO.
  * @return SUCCESS in case of success, FAILURE otherwise.
  */
-int32_t gpio_get(gpio_desc **desc,
-		 uint8_t gpio_number)
-{
+int32_t gpio_get(gpio_desc **desc, uint8_t gpio_number) {
 	gpio_desc *dev;
 
 	if (gpio_number < 32)
 		return FAILURE;
 
-	dev = (gpio_desc *)malloc(sizeof(*dev));
+	dev = (gpio_desc *) malloc(sizeof(*dev));
 	if (!dev)
 		return FAILURE;
 
 	dev->number = gpio_number;
-	dev->id 	= 0;
+	dev->id = 0;
 
 #ifdef ZYNQ_PS7
 	dev->type = ZYNQ_PS7_GPIO;
@@ -351,8 +335,7 @@ int32_t gpio_get(gpio_desc **desc,
  * @param desc - The SPI descriptor.
  * @return SUCCESS in case of success, FAILURE otherwise.
  */
-int32_t gpio_remove(gpio_desc *desc)
-{
+int32_t gpio_remove(gpio_desc *desc) {
 	free(desc);
 
 	return SUCCESS;
@@ -363,8 +346,7 @@ int32_t gpio_remove(gpio_desc *desc)
  * @param desc - The GPIO descriptor.
  * @return SUCCESS in case of success, FAILURE otherwise.
  */
-int32_t gpio_direction_input(gpio_desc *desc)
-{
+int32_t gpio_direction_input(gpio_desc *desc) {
 	if (desc) {
 		// Unused variable - fix compiler warning
 	}
@@ -380,9 +362,7 @@ int32_t gpio_direction_input(gpio_desc *desc)
  *                         GPIO_LOW
  * @return SUCCESS in case of success, FAILURE otherwise.
  */
-int32_t gpio_direction_output(gpio_desc *desc,
-			      uint8_t value)
-{
+int32_t gpio_direction_output(gpio_desc *desc, uint8_t value) {
 	if (desc) {
 		// Unused variable - fix compiler warning
 	}
@@ -402,9 +382,7 @@ int32_t gpio_direction_output(gpio_desc *desc,
  *                             GPIO_IN
  * @return SUCCESS in case of success, FAILURE otherwise.
  */
-int32_t gpio_get_direction(gpio_desc *desc,
-			   uint8_t *direction)
-{
+int32_t gpio_get_direction(gpio_desc *desc, uint8_t *direction) {
 	if (desc) {
 		// Unused variable - fix compiler warning
 	}
@@ -424,9 +402,7 @@ int32_t gpio_get_direction(gpio_desc *desc,
  *                         GPIO_LOW
  * @return SUCCESS in case of success, FAILURE otherwise.
  */
-int32_t gpio_set_value(gpio_desc *desc,
-		       uint8_t value)
-{
+int32_t gpio_set_value(gpio_desc *desc, uint8_t value) {
 	int32_t pstatus;
 	uint32_t ppos;
 	uint32_t pdata;
@@ -436,18 +412,18 @@ int32_t gpio_set_value(gpio_desc *desc,
 	ppos = desc->number - 32;
 	pmask = 0x1 << ppos;
 
-	switch(desc->type) {
+	switch (desc->type) {
 #ifdef ZYNQ_PS7
 	case ZYNQ_PS7_GPIO:
-		pdata = Xil_In32(XPAR_PS7_GPIO_0_BASEADDR + 0x02c4);
-		Xil_Out32((XPAR_PS7_GPIO_0_BASEADDR + 0x02c4), (pdata | pmask));
-		pdata = Xil_In32(XPAR_PS7_GPIO_0_BASEADDR + 0x02c8);
-		Xil_Out32((XPAR_PS7_GPIO_0_BASEADDR + 0x02c8), (pdata | pmask));
-		pdata = Xil_In32(XPAR_PS7_GPIO_0_BASEADDR + 0x004c);
-		Xil_Out32((XPAR_PS7_GPIO_0_BASEADDR + 0x004c),
-			  ((pdata & ~pmask) | (value << ppos)));
-		pstatus = 0;
-		break;
+	pdata = Xil_In32(XPAR_PS7_GPIO_0_BASEADDR + 0x02c4);
+	Xil_Out32((XPAR_PS7_GPIO_0_BASEADDR + 0x02c4), (pdata | pmask));
+	pdata = Xil_In32(XPAR_PS7_GPIO_0_BASEADDR + 0x02c8);
+	Xil_Out32((XPAR_PS7_GPIO_0_BASEADDR + 0x02c8), (pdata | pmask));
+	pdata = Xil_In32(XPAR_PS7_GPIO_0_BASEADDR + 0x004c);
+	Xil_Out32((XPAR_PS7_GPIO_0_BASEADDR + 0x004c),
+			((pdata & ~pmask) | (value << ppos)));
+	pstatus = 0;
+	break;
 #endif
 #ifdef ZYNQ_PSU
 	case ZYNQ_PSU_GPIO:
@@ -457,25 +433,25 @@ int32_t gpio_set_value(gpio_desc *desc,
 		Xil_Out32((XPAR_PSU_GPIO_0_BASEADDR + 0x0308), (pdata | pmask));
 		pdata = Xil_In32(XPAR_PSU_GPIO_0_BASEADDR + 0x0050);
 		Xil_Out32((XPAR_PSU_GPIO_0_BASEADDR + 0x0050),
-			  ((pdata & ~pmask) | (value << ppos)));
+				((pdata & ~pmask) | (value << ppos)));
 		pstatus = 0;
 		break;
 #endif
 #ifdef NIOS_II
-	case NIOS_II_GPIO:
+		case NIOS_II_GPIO:
 		pdata = IORD_32DIRECT(SYS_GPIO_OUT_BASE, 0x0);
 		IOWR_32DIRECT(SYS_GPIO_OUT_BASE, 0x0,
-			      ((pdata & ~pmask) | (value << ppos)));
+				((pdata & ~pmask) | (value << ppos)));
 		pstatus = 0;
 		break;
 #endif
 #ifdef MICROBLAZE
-	case MICROBLAZE_GPIO:
+		case MICROBLAZE_GPIO:
 		pdata = Xil_In32(XPAR_AXI_GPIO_BASEADDR + 0xc);
 		Xil_Out32((XPAR_AXI_GPIO_BASEADDR + 0xc), (pdata & ~pmask));
 		pdata = Xil_In32(XPAR_AXI_GPIO_BASEADDR + 0x8);
 		Xil_Out32((XPAR_AXI_GPIO_BASEADDR + 0x8),
-			  ((pdata & ~pmask) | (value << ppos)));
+				((pdata & ~pmask) | (value << ppos)));
 		pstatus = 0;
 		break;
 #endif
@@ -483,7 +459,7 @@ int32_t gpio_set_value(gpio_desc *desc,
 		break;
 	}
 
-	return(pstatus);
+	return (pstatus);
 }
 
 /**
@@ -494,9 +470,7 @@ int32_t gpio_set_value(gpio_desc *desc,
  *                         GPIO_LOW
  * @return SUCCESS in case of success, FAILURE otherwise.
  */
-int32_t gpio_get_value(gpio_desc *desc,
-		       uint8_t *value)
-{
+int32_t gpio_get_value(gpio_desc *desc, uint8_t *value) {
 	int32_t pstatus;
 	uint32_t ppos;
 	uint32_t pdata;
@@ -510,15 +484,15 @@ int32_t gpio_get_value(gpio_desc *desc,
 	pmask = 0x1 << ppos;
 #endif
 
-	switch(desc->type) {
+	switch (desc->type) {
 #ifdef ZYNQ_PS7
 	case ZYNQ_PS7_GPIO:
-		pdata = Xil_In32(XPAR_PS7_GPIO_0_BASEADDR + 0x02c4);
-		Xil_Out32((XPAR_PS7_GPIO_0_BASEADDR + 0x02c4), (pdata & ~pmask));
-		pdata = Xil_In32(XPAR_PS7_GPIO_0_BASEADDR + 0x004c);
-		*value = (pdata >> ppos) & 0x1;
-		pstatus = 0;
-		break;
+	pdata = Xil_In32(XPAR_PS7_GPIO_0_BASEADDR + 0x02c4);
+	Xil_Out32((XPAR_PS7_GPIO_0_BASEADDR + 0x02c4), (pdata & ~pmask));
+	pdata = Xil_In32(XPAR_PS7_GPIO_0_BASEADDR + 0x004c);
+	*value = (pdata >> ppos) & 0x1;
+	pstatus = 0;
+	break;
 #endif
 #ifdef ZYNQ_PSU
 	case ZYNQ_PSU_GPIO:
@@ -530,14 +504,14 @@ int32_t gpio_get_value(gpio_desc *desc,
 		break;
 #endif
 #ifdef NIOS_II
-	case NIOS_II_GPIO:
+		case NIOS_II_GPIO:
 		pdata = IORD_32DIRECT(SYS_GPIO_OUT_BASE, 0x0);
 		*value = (pdata >> ppos) & 0x1;
 		pstatus = 0;
 		break;
 #endif
 #ifdef MICROBLAZE
-	case MICROBLAZE_GPIO:
+		case MICROBLAZE_GPIO:
 		pdata = Xil_In32(XPAR_AXI_GPIO_BASEADDR + 0x8);
 		*value = (pdata >> ppos) & 0x1;
 		pstatus = 0;
@@ -547,15 +521,14 @@ int32_t gpio_get_value(gpio_desc *desc,
 		break;
 	}
 
-	return(pstatus);
+	return (pstatus);
 }
 
 /***************************************************************************//**
  * @brief ad_gpio_set_range
  ******************************************************************************/
 
-int32_t ad_gpio_set_range(uint8_t start_pin, uint8_t num_pins, uint8_t data)
-{
+int32_t ad_gpio_set_range(uint8_t start_pin, uint8_t num_pins, uint8_t data) {
 
 	int32_t pstatus;
 	uint32_t ppos;
@@ -563,7 +536,7 @@ int32_t ad_gpio_set_range(uint8_t start_pin, uint8_t num_pins, uint8_t data)
 	uint32_t pmask;
 
 	if (start_pin < 32) {
-		return(-1);
+		return (-1);
 	}
 
 	pstatus = -1;
@@ -578,7 +551,7 @@ int32_t ad_gpio_set_range(uint8_t start_pin, uint8_t num_pins, uint8_t data)
 	Xil_Out32((XPAR_PS7_GPIO_0_BASEADDR + 0x02c8), (pdata | pmask));
 	pdata = Xil_In32(XPAR_PS7_GPIO_0_BASEADDR + 0x004c);
 	Xil_Out32((XPAR_PS7_GPIO_0_BASEADDR + 0x004c),
-		  ((pdata & ~pmask) | (data << ppos)));
+			((pdata & ~pmask) | (data << ppos)));
 	pstatus = 0;
 
 #endif
@@ -591,7 +564,7 @@ int32_t ad_gpio_set_range(uint8_t start_pin, uint8_t num_pins, uint8_t data)
 	Xil_Out32((XPAR_PSU_GPIO_0_BASEADDR + 0x0308), (pdata | pmask));
 	pdata = Xil_In32(XPAR_PSU_GPIO_0_BASEADDR + 0x0050);
 	Xil_Out32((XPAR_PSU_GPIO_0_BASEADDR + 0x0050),
-		  ((pdata & ~pmask) | (data << ppos)));
+			((pdata & ~pmask) | (data << ppos)));
 	pstatus = 0;
 
 #endif
@@ -610,20 +583,19 @@ int32_t ad_gpio_set_range(uint8_t start_pin, uint8_t num_pins, uint8_t data)
 	Xil_Out32((XPAR_AXI_GPIO_BASEADDR + 0xc), (pdata & ~pmask));
 	pdata = Xil_In32(XPAR_AXI_GPIO_BASEADDR + 0x8);
 	Xil_Out32((XPAR_AXI_GPIO_BASEADDR + 0x8),
-		  ((pdata & ~pmask) | (data << ppos)));
+			((pdata & ~pmask) | (data << ppos)));
 	pstatus = 0;
 
 #endif
 
-	return(pstatus);
+	return (pstatus);
 }
 
 /***************************************************************************//**
  * @brief ad_gpio_get_range
  ******************************************************************************/
 
-int32_t ad_gpio_get_range(uint8_t start_pin, uint8_t num_pins, uint32_t *data)
-{
+int32_t ad_gpio_get_range(uint8_t start_pin, uint8_t num_pins, uint32_t *data) {
 
 	int32_t pstatus;
 	uint32_t ppos;
@@ -631,7 +603,7 @@ int32_t ad_gpio_get_range(uint8_t start_pin, uint8_t num_pins, uint32_t *data)
 	uint32_t pmask;
 
 	if (start_pin < 32) {
-		return(-1);
+		return (-1);
 	}
 
 	pstatus = -1;
@@ -674,14 +646,13 @@ int32_t ad_gpio_get_range(uint8_t start_pin, uint8_t num_pins, uint32_t *data)
 
 #endif
 
-	return(pstatus);
+	return (pstatus);
 }
 
 /***************************************************************************//**
  * @brief do_div
  ******************************************************************************/
-uint64_t do_div(uint64_t* n, uint64_t base)
-{
+uint64_t do_div(uint64_t* n, uint64_t base) {
 	uint64_t mod = 0;
 
 	mod = *n % base;
@@ -693,15 +664,14 @@ uint64_t do_div(uint64_t* n, uint64_t base)
 /***************************************************************************//**
  * @brief ad_reg_write_16
  ******************************************************************************/
-void ad_reg_write_16(uint32_t addr, uint32_t data)
-{
+void ad_reg_write_16(uint32_t addr, uint32_t data) {
 	uint32_t m_data;
 
 	m_data = ad_reg_read(addr & ~0x3);
 	if ((addr & 0x3) == 0)
 		m_data = (m_data & ~0xffff) | data;
 	else
-		m_data = (m_data & 0xffff) | (data<<16);
+		m_data = (m_data & 0xffff) | (data << 16);
 	ad_reg_write((addr & ~0x3), m_data);
 }
 
@@ -736,8 +706,7 @@ void usleep(uint32_t us_count)
 /***************************************************************************//**
  * @brief ad_uart_read
  ******************************************************************************/
-uint8_t ad_uart_read()
-{
+uint8_t ad_uart_read() {
 #ifdef ZYNQ_PS7
 
 	u32 RecievedByte;
@@ -761,13 +730,12 @@ uint8_t ad_uart_read()
 /***************************************************************************//**
  * @brief ad_pow2 Create a mask for a given number of bit
  ******************************************************************************/
-uint32_t ad_pow2(uint32_t number)
-{
+uint32_t ad_pow2(uint32_t number) {
 
 	uint32_t index;
 	uint32_t mask = 1;
 
-	for (index=1; index < number; index++) {
+	for (index = 1; index < number; index++) {
 		mask = (mask << 1) ^ 1;
 	}
 

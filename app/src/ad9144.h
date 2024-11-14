@@ -1348,7 +1348,6 @@
 #define CMM_FLAG_OR_MASK			(1 << 4)
 #define CMM_ENABLE				(1 << 3)
 
-
 #define AD9144_MAX_DAC_RATE			2000000000UL
 #define AD9144_CHIP_ID				0x44
 #define AD9144_PRBS7				0x0
@@ -1373,55 +1372,51 @@ struct ad9144_dev {
 
 struct ad9144_init_param {
 	/* SPI */
-	spi_init_param	spi_init;
+	spi_init_param spi_init;
 	/* Device Settings */
-	uint8_t		spi3wire; // set device spi intereface 3/4 wires
-	uint8_t		interpolation; // interpolation factor
-	uint32_t	stpl_samples[4][4];
-	uint32_t	lane_rate_kbps;
-	uint32_t	prbs_type;
+	uint8_t spi3wire; // set device spi intereface 3/4 wires
+	uint8_t interpolation; // interpolation factor
+	uint32_t stpl_samples[4][4];
+	uint32_t lane_rate_kbps;
+	uint32_t prbs_type;
 
-	uint8_t		jesd204_mode;
-	uint8_t		jesd204_subclass;
-	uint8_t		jesd204_scrambling;
-	uint8_t		jesd204_lane_xbar[8];
+	uint8_t jesd204_mode;
+	uint8_t jesd204_subclass;
+	uint8_t jesd204_scrambling;
+	uint8_t jesd204_lane_xbar[8];
 
 	/* Whether to enable the internal DAC PLL (0=disable, 1=enable) */
-	uint8_t		pll_enable;
+	uint8_t pll_enable;
 	/* When using the DAC PLL this specifies the external reference clock frequency in kHz. */
-	uint32_t	pll_ref_frequency_khz;
+	uint32_t pll_ref_frequency_khz;
 	/* When using the DAC PLL this specifies the target PLL output frequency in kHz. */
-	uint32_t	pll_dac_frequency_khz;
+	uint32_t pll_dac_frequency_khz;
 };
 
 /******************************************************************************/
 /************************ Functions Declarations ******************************/
 /******************************************************************************/
 int32_t ad9144_setup(struct ad9144_dev **device,
-		     const struct ad9144_init_param *init_param);
+		const struct ad9144_init_param *init_param);
 
 int32_t ad9144_remove(struct ad9144_dev *dev);
 
-int32_t ad9144_spi_read(struct ad9144_dev *dev,
-			uint16_t reg_addr,
-			uint8_t *reg_data);
+int32_t ad9144_spi_read(struct ad9144_dev *dev, uint16_t reg_addr,
+		uint8_t *reg_data);
 
-int32_t ad9144_spi_write(struct ad9144_dev *dev,
-			 uint16_t reg_addr,
-			 uint8_t reg_data);
+int32_t ad9144_spi_write(struct ad9144_dev *dev, uint16_t reg_addr,
+		uint8_t reg_data);
 
-int32_t ad9144_spi_check_status(struct ad9144_dev *dev,
-				uint16_t reg_addr,
-				uint8_t reg_mask,
-				uint8_t exp_reg_data);
+int32_t ad9144_spi_check_status(struct ad9144_dev *dev, uint16_t reg_addr,
+		uint8_t reg_mask, uint8_t exp_reg_data);
 
 int32_t ad9144_status(struct ad9144_dev *dev);
 
 int32_t ad9144_short_pattern_test(struct ad9144_dev *dev,
-				  const struct ad9144_init_param *init_param);
+		const struct ad9144_init_param *init_param);
 
 int32_t ad9144_datapath_prbs_test(struct ad9144_dev *dev,
-				  const struct ad9144_init_param *init_param);
+		const struct ad9144_init_param *init_param);
 
 int32_t ad9144_dac_calibrate(struct ad9144_dev *dev);
 

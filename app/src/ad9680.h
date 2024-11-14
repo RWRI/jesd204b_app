@@ -81,34 +81,31 @@
 /******************************************************************************/
 struct ad9680_dev {
 	/* SPI */
-	spi_desc	*spi_desc;
+	spi_desc *spi_desc;
 };
 
 struct ad9680_init_param {
 	/* SPI */
-	spi_init_param	spi_init;
+	spi_init_param spi_init;
 	/* Device Settings */
-	uint32_t	lane_rate_kbps;
+	uint32_t lane_rate_kbps;
 };
 
 /******************************************************************************/
 /************************ Functions Declarations ******************************/
 /******************************************************************************/
 
-int32_t ad9680_spi_read(struct ad9680_dev *dev,
-			uint16_t reg_addr,
-			uint8_t *reg_data);
+int32_t ad9680_spi_read(struct ad9680_dev *dev, uint16_t reg_addr,
+		uint8_t *reg_data);
 
-int32_t ad9680_spi_write(struct ad9680_dev *dev,
-			 uint16_t reg_addr,
-			 uint8_t reg_data);
+int32_t ad9680_spi_write(struct ad9680_dev *dev, uint16_t reg_addr,
+		uint8_t reg_data);
 
 int32_t ad9680_setup(struct ad9680_dev **device,
-		     const struct ad9680_init_param *init_param);
+		const struct ad9680_init_param *init_param);
 
 int32_t ad9680_remove(struct ad9680_dev *dev);
 
-int32_t ad9680_test(struct ad9680_dev *dev,
-		    uint32_t test_mode);
+int32_t ad9680_test(struct ad9680_dev *dev, uint32_t test_mode);
 
 #endif

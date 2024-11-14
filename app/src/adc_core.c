@@ -45,16 +45,13 @@
 /***************************************************************************//**
  * @brief adc_read
  *******************************************************************************/
-int32_t adc_read(adc_core core,
-		uint32_t reg_addr,
-		uint32_t *reg_data)
-{
+int32_t adc_read(adc_core core, uint32_t reg_addr, uint32_t *reg_data) {
 	*reg_data = ad_reg_read((core.base_address + reg_addr));
 
 	if (*reg_data == 0xDEADDEAD) {
-		#ifdef DEBUG
-			ad_printf("adc_read failed for register: %x", reg_addr);
-		#endif
+#ifdef DEBUG
+		ad_printf("adc_read failed for register: %x", reg_addr);
+#endif
 		return -1;
 	} else {
 		return 0;
@@ -64,16 +61,13 @@ int32_t adc_read(adc_core core,
 /***************************************************************************//**
  * @brief adc_write
  *******************************************************************************/
-int32_t adc_write(adc_core core,
-		uint32_t reg_addr,
-		uint32_t reg_data)
-{
+int32_t adc_write(adc_core core, uint32_t reg_addr, uint32_t reg_data) {
 	ad_reg_write((core.base_address + reg_addr), reg_data);
 
-		#ifdef DEBUG
-			uint32_t reg_data_r;
-			return adc_read(core, reg_addr, &reg_data_r);
-		#endif
+#ifdef DEBUG
+	uint32_t reg_data_r;
+	return adc_read(core, reg_addr, &reg_data_r);
+#endif
 
 	return 0;
 }
@@ -81,9 +75,8 @@ int32_t adc_write(adc_core core,
 /***************************************************************************//**
  * @brief adc_setup
  *******************************************************************************/
-int32_t adc_setup(adc_core core)
-{
-	uint8_t	 index;
+int32_t adc_setup(adc_core core) {
+	uint8_t index;
 	uint32_t reg_data;
 	uint32_t adc_clock;
 
@@ -96,16 +89,16 @@ int32_t adc_setup(adc_core core)
 	adc_write(core, ADC_REG_RSTN, 0);
 	adc_write(core, ADC_REG_RSTN, ADC_MMCM_RSTN | ADC_RSTN);
 
-	for(index = 0; index < core.no_of_channels; index++) {
+	for (index = 0; index < core.no_of_channels; index++) {
 		adc_write(core, ADC_REG_CHAN_CNTRL(index), ADC_FORMAT_SIGNEXT |
-							   ADC_FORMAT_ENABLE |
-							   ADC_ENABLE);
+		ADC_FORMAT_ENABLE |
+		ADC_ENABLE);
 	}
 
 	mdelay(100);
 
 	adc_read(core, ADC_REG_STATUS, &reg_data);
-	if(reg_data == 0x0) {
+	if (reg_data == 0x0) {
 		ad_printf("\r%s adc core Status errors.\n", __func__);
 		return -1;
 	}
@@ -129,50 +122,48 @@ int32_t adc_setup(adc_core core)
  *		and the output mode must be two's complement
 
  * @return 0.
-*******************************************************************************/
-uint32_t adc_set_delay(adc_core core, uint32_t no_of_lanes, uint32_t delay)
-{
-    uint32_t i;
-    uint32_t rdata;
-    uint32_t pcore_version;
+ *******************************************************************************/
+uint32_t adc_set_delay(adc_core core, uint32_t no_of_lanes, uint32_t delay) {
+	uint32_t i;
+	uint32_t rdata;
+	uint32_t pcore_version;
 
-    adc_read(core, 0x0, &pcore_version);
-    pcore_version >>= 16;
-    if (pcore_version < 9) {
-			    ad_printf(" pcore_version is : %d\n\r", pcore_version);
-			    ad_printf(" DRIVER DOES NOT SUPPORT PCORE VERSIONS OLDER THAN 10 !");
-			    return -1;
-    } else {
+	adc_read(core, 0x0, &pcore_version);
+	pcore_version >>= 16;
+	if (pcore_version < 9) {
+		ad_printf(" pcore_version is : %d\n\r", pcore_version);
+		ad_printf(" DRIVER DOES NOT SUPPORT PCORE VERSIONS OLDER THAN 10 !");
+		return -1;
+	} else {
 		for (i = 0; i < no_of_lanes; i++) {
-			adc_write(core ,((0x200 + i)*4), delay);
-			adc_read(core ,((0x200 + i)*4), &rdata);
+			adc_write(core, ((0x200 + i) * 4), delay);
+			adc_read(core, ((0x200 + i) * 4), &rdata);
 			if (rdata != delay) {
-				ad_printf("adc_delay_1: sel(%2d), rcv(%04x), exp(%04x)\n\r", i, rdata, delay);
+				ad_printf("adc_delay_1: sel(%2d), rcv(%04x), exp(%04x)\n\r", i,
+						rdata, delay);
 			}
 		}
-    }
+	}
 
-    return 0;
+	return 0;
 }
 
 /***************************************************************************//**
  * @brief ADC delay.
  *
-*******************************************************************************/
-uint32_t adc_delay_calibrate(adc_core core,
-			uint32_t no_of_lanes,
-			enum adc_pn_sel sel)
-{
-	uint8_t err_field[32] = {0};
-	uint16_t valid_range[5] = {0};
-	uint16_t invalid_range[5] = {0};
+ *******************************************************************************/
+uint32_t adc_delay_calibrate(adc_core core, uint32_t no_of_lanes,
+		enum adc_pn_sel sel) {
+	uint8_t err_field[32] = { 0 };
+	uint16_t valid_range[5] = { 0 };
+	uint16_t invalid_range[5] = { 0 };
 	uint16_t delay = 0;
 	uint16_t start_valid_delay = 32;
 	uint16_t start_invalid_delay = 32;
 	uint8_t interval = 0;
 	uint8_t max_interval = 0;
 	uint8_t max_valid_range = 0;
-	uint8_t cnt_valid[5] = {0};
+	uint8_t cnt_valid[5] = { 0 };
 	uint8_t cnt_invalid = 0;
 	uint8_t val = 0;
 	uint8_t max_val = 32;
@@ -182,7 +173,8 @@ uint32_t adc_delay_calibrate(adc_core core,
 		mdelay(20);
 		if (adc_pn_mon(core, sel) == 0) {
 			err_field[delay] = 0;
-			start_valid_delay = start_valid_delay == 32 ? delay : start_valid_delay;
+			start_valid_delay =
+					start_valid_delay == 32 ? delay : start_valid_delay;
 		} else {
 			err_field[delay] = 1;
 		}
@@ -190,7 +182,7 @@ uint32_t adc_delay_calibrate(adc_core core,
 	if (start_valid_delay > 31) {
 		ad_printf("%s FAILED.\n", __func__);
 		adc_set_delay(core, no_of_lanes, 0);
-		return(1);
+		return (1);
 	}
 
 	start_valid_delay = 32;
@@ -200,17 +192,17 @@ uint32_t adc_delay_calibrate(adc_core core,
 			if (start_valid_delay == 32) {
 				start_valid_delay = val;
 			}
-			if (start_valid_delay != 32 && start_invalid_delay != 32 ) {
+			if (start_valid_delay != 32 && start_invalid_delay != 32) {
 				start_valid_delay = 32;
 				start_invalid_delay = 32;
 			}
 			cnt_valid[interval]++;
 		}
-		if((err_field[val] == 1) || (val == max_val - 1)) {
+		if ((err_field[val] == 1) || (val == max_val - 1)) {
 			if (start_invalid_delay == 32) {
 				start_invalid_delay = val;
 			}
-			if (start_valid_delay != 32 && start_invalid_delay != 32 ) {
+			if (start_valid_delay != 32 && start_invalid_delay != 32) {
 				valid_range[interval] = start_valid_delay;
 				invalid_range[interval] = start_invalid_delay;
 				start_valid_delay = 32;
@@ -240,17 +232,14 @@ uint32_t adc_delay_calibrate(adc_core core,
 	}
 #endif
 
-    return(0);
+	return (0);
 }
 
 /***************************************************************************//**
  * @brief adc_set_pnsel
  *	  Note: The device must be in PRBS test mode, when calling this function
  *******************************************************************************/
-int32_t adc_set_pnsel(adc_core core,
-		uint8_t channel,
-		enum adc_pn_sel sel)
-{
+int32_t adc_set_pnsel(adc_core core, uint8_t channel, enum adc_pn_sel sel) {
 	uint32_t reg;
 
 	adc_read(core, ADC_REG_CHAN_CNTRL_3(channel), &reg);
@@ -265,17 +254,15 @@ int32_t adc_set_pnsel(adc_core core,
  * @brief adc_pn_mon
  *	  Note: The device must be in PRBS test mode, when calling this function
  *******************************************************************************/
-int32_t adc_pn_mon(adc_core core,
-		enum adc_pn_sel sel)
-{
-	uint8_t	index;
+int32_t adc_pn_mon(adc_core core, enum adc_pn_sel sel) {
+	uint8_t index;
 	uint32_t reg_data;
 	int32_t pn_errors = 0;
 
 	for (index = 0; index < core.no_of_channels; index++) {
- 		adc_read(core, ADC_REG_CHAN_CNTRL(index), &reg_data);
- 		reg_data |= ADC_ENABLE;
- 		adc_write(core, ADC_REG_CHAN_CNTRL(index), reg_data);
+		adc_read(core, ADC_REG_CHAN_CNTRL(index), &reg_data);
+		reg_data |= ADC_ENABLE;
+		adc_write(core, ADC_REG_CHAN_CNTRL(index), reg_data);
 		adc_set_pnsel(core, index, sel);
 	}
 	mdelay(1);
@@ -299,61 +286,75 @@ int32_t adc_pn_mon(adc_core core,
  * @brief adc_ramp_test
  *	  This functions supports channel number multiple of 2 (e.g 1/2/4/6/8...)
  *******************************************************************************/
-int32_t adc_ramp_test(adc_core core,
-		uint8_t no_of_cores,
-		uint32_t no_of_samples,
-		uint32_t start_address)
-{
-	uint8_t	 err_cnt = 0;
+int32_t adc_ramp_test(adc_core core, uint8_t no_of_cores,
+		uint32_t no_of_samples, uint32_t start_address) {
+	uint8_t err_cnt = 0;
 	uint16_t exp_data[32];
 	uint16_t rcv_data[32];
 	uint8_t index;
 	uint32_t mask = ad_pow2(core.resolution);
-	uint8_t no_of_channels = core.no_of_channels*no_of_cores;
+	uint8_t no_of_channels = core.no_of_channels * no_of_cores;
 	uint32_t current_address = start_address;
-	uint32_t last_address = start_address + (no_of_channels*no_of_samples)*2;
+	uint32_t last_address = start_address
+			+ (no_of_channels * no_of_samples) * 2;
 	uint32_t sample_count = 0;
 
 	while (current_address < last_address) {
 
 		// read data back from memory, one samples from each channel, min a word
-		for (index=0; index<no_of_channels; index+=2) {
+		for (index = 0; index < no_of_channels; index += 2) {
 			rcv_data[index] = ad_reg_read(current_address + index) & mask;
-			rcv_data[index+1] = (ad_reg_read(current_address + index) >> 16) & mask;
+			rcv_data[index + 1] = (ad_reg_read(current_address + index) >> 16)
+					& mask;
 		}
 
 		// generate expected data
-		for (index=0; index<no_of_channels; index+=2) {
+		for (index = 0; index < no_of_channels; index += 2) {
 			if (current_address == start_address) {
 				exp_data[index] = rcv_data[index];
-				exp_data[index+1] = rcv_data[index+1];
+				exp_data[index + 1] = rcv_data[index + 1];
 			} else {
-				if(no_of_channels < 2) {
-					exp_data[index] = ((exp_data[index]+2) > mask) ? ((exp_data[index]+2) & mask) : (exp_data[index] + 2);
-					exp_data[index+1] = ((exp_data[index+1]+2) > mask) ? ((exp_data[index+1]+2) & mask) : (exp_data[index+1] + 2);
+				if (no_of_channels < 2) {
+					exp_data[index] =
+							((exp_data[index] + 2) > mask) ?
+									((exp_data[index] + 2) & mask) :
+									(exp_data[index] + 2);
+					exp_data[index + 1] =
+							((exp_data[index + 1] + 2) > mask) ?
+									((exp_data[index + 1] + 2) & mask) :
+									(exp_data[index + 1] + 2);
 				} else {
-					exp_data[index] = (exp_data[index] == mask) ? 0 : exp_data[index] + 1;
-					exp_data[index+1] = (exp_data[index+1] == mask) ? 0 : exp_data[index+1] + 1;
+					exp_data[index] =
+							(exp_data[index] == mask) ? 0 : exp_data[index] + 1;
+					exp_data[index + 1] =
+							(exp_data[index + 1] == mask) ?
+									0 : exp_data[index + 1] + 1;
 				}
 			}
 		}
 
 		// compare received and expected
-		for (index=0; index<no_of_channels; index+=2) {
-			if ((rcv_data[index] != exp_data[index]) || (rcv_data[index+1] != exp_data[index+1])) {
+		for (index = 0; index < no_of_channels; index += 2) {
+			if ((rcv_data[index] != exp_data[index])
+					|| (rcv_data[index + 1] != exp_data[index + 1])) {
 				ad_printf("%s Capture Error[%d]: rcv(%08x) exp(%08x).\n",
-						__func__, sample_count+index, rcv_data[index], exp_data[index]);
+						__func__, sample_count + index, rcv_data[index],
+						exp_data[index]);
 				ad_printf("%s Capture Error[%d]: rcv(%08x) exp(%08x).\n",
-						__func__, sample_count+index+1, rcv_data[index+1], exp_data[index+1]);
+						__func__, sample_count + index + 1, rcv_data[index + 1],
+						exp_data[index + 1]);
 				err_cnt++;
-				if (err_cnt == 50) break;
+				if (err_cnt == 50)
+					break;
 			}
 		}
-		sample_count+=index;
+		sample_count += index;
 
 		// increment address pointer
-		current_address = (no_of_channels == 1) ? (current_address+4) :
-							(current_address+(no_of_channels*2));
+		current_address =
+				(no_of_channels == 1) ?
+						(current_address + 4) :
+						(current_address + (no_of_channels * 2));
 	}
 
 	if (err_cnt)

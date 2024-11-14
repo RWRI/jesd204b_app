@@ -340,10 +340,7 @@ enum pll1_rzero_resistor {
 };
 
 enum rpole2_resistor {
-	RPOLE2_900_OHM,
-	RPOLE2_450_OHM,
-	RPOLE2_300_OHM,
-	RPOLE2_225_OHM,
+	RPOLE2_900_OHM, RPOLE2_450_OHM, RPOLE2_300_OHM, RPOLE2_225_OHM,
 };
 
 enum rzero_resistor {
@@ -358,14 +355,8 @@ enum rzero_resistor {
 };
 
 enum cpole1_capacitor {
-	CPOLE1_0_PF,
-	CPOLE1_8_PF,
-	CPOLE1_16_PF,
-	CPOLE1_24_PF,
-	_CPOLE1_24_PF, /* place holder */
-	CPOLE1_32_PF,
-	CPOLE1_40_PF,
-	CPOLE1_48_PF,
+	CPOLE1_0_PF, CPOLE1_8_PF, CPOLE1_16_PF, CPOLE1_24_PF, _CPOLE1_24_PF, /* place holder */
+	CPOLE1_32_PF, CPOLE1_40_PF, CPOLE1_48_PF,
 };
 
 /**
@@ -469,47 +460,40 @@ struct ad9523_state {
 };
 
 enum ad9523_out_frequencies {
-	AD9523_VCO1,
-	AD9523_VCO2,
-	AD9523_VCXO,
-	AD9523_NUM_CLK_SRC,
+	AD9523_VCO1, AD9523_VCO2, AD9523_VCXO, AD9523_NUM_CLK_SRC,
 };
 
 struct ad9523_dev {
 	/* SPI */
-	spi_desc			*spi_desc;
+	spi_desc *spi_desc;
 	/* Device Settings */
-	struct ad9523_state		ad9523_st;
-	struct ad9523_platform_data	*pdata;
+	struct ad9523_state ad9523_st;
+	struct ad9523_platform_data *pdata;
 };
 
 struct ad9523_init_param {
 	/* SPI */
-	spi_init_param	spi_init;
+	spi_init_param spi_init;
 	/* Device Settings */
-	struct ad9523_platform_data	*pdata;
+	struct ad9523_platform_data *pdata;
 };
 
 /******************************************************************************/
 /************************ Functions Declarations ******************************/
 /******************************************************************************/
 /* Reads the value of the selected register. */
-int32_t ad9523_spi_read(struct ad9523_dev *dev,
-			uint32_t reg_addr,
-			uint32_t *reg_data);
+int32_t ad9523_spi_read(struct ad9523_dev *dev, uint32_t reg_addr,
+		uint32_t *reg_data);
 
 /* Writes a value to the selected register. */
-int32_t ad9523_spi_write(struct ad9523_dev *dev,
-			 uint32_t reg_addr,
-			 uint32_t reg_data);
+int32_t ad9523_spi_write(struct ad9523_dev *dev, uint32_t reg_addr,
+		uint32_t reg_data);
 
 /* Updates the AD9523 configuration */
 int32_t ad9523_io_update(struct ad9523_dev *dev);
 
 /* Sets the clock provider for selected channel. */
-int32_t ad9523_vco_out_map(struct ad9523_dev *dev,
-			   uint32_t ch,
-			   uint32_t out);
+int32_t ad9523_vco_out_map(struct ad9523_dev *dev, uint32_t ch, uint32_t out);
 
 /* Updates the AD9523 configuration. */
 int32_t ad9523_sync(struct ad9523_dev *dev);
@@ -519,7 +503,7 @@ int32_t ad9523_init(struct ad9523_init_param *init_param);
 
 /* Configure the AD9523. */
 int32_t ad9523_setup(struct ad9523_dev **device,
-		     const struct ad9523_init_param *init_param);
+		const struct ad9523_init_param *init_param);
 
 /* Free the resources allocated by ad9523_setup(). */
 int32_t ad9523_remove(struct ad9523_dev *dev);

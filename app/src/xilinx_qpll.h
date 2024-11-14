@@ -90,40 +90,30 @@ typedef struct {
 /************************ Functions Declarations ******************************/
 /******************************************************************************/
 
-int32_t xilinx_xcvr_calc_qpll_config(xcvr_core *core,
-				     uint32_t refclk_khz,
-				     uint32_t lane_rate_khz,
-				     struct xilinx_xcvr_qpll_config *conf,
-				     uint32_t *out_div);
+int32_t xilinx_xcvr_calc_qpll_config(xcvr_core *core, uint32_t refclk_khz,
+		uint32_t lane_rate_khz, struct xilinx_xcvr_qpll_config *conf,
+		uint32_t *out_div);
 
-int32_t xilinx_xcvr_gth34_qpll_read_config(xcvr_core *core,
-		uint32_t drp_port,
+int32_t xilinx_xcvr_gth34_qpll_read_config(xcvr_core *core, uint32_t drp_port,
 		struct xilinx_xcvr_qpll_config *conf);
 
-int32_t xilinx_xcvr_gtx2_qpll_read_config(xcvr_core *core,
-		uint32_t drp_port,
+int32_t xilinx_xcvr_gtx2_qpll_read_config(xcvr_core *core, uint32_t drp_port,
 		struct xilinx_xcvr_qpll_config *conf);
 
-int32_t xilinx_xcvr_qpll_read_config(xcvr_core *core,
-				     uint32_t drp_port,
-				     struct xilinx_xcvr_qpll_config *conf);
+int32_t xilinx_xcvr_qpll_read_config(xcvr_core *core, uint32_t drp_port,
+		struct xilinx_xcvr_qpll_config *conf);
 
-int32_t xilinx_xcvr_gtx2_qpll_write_config(xcvr_core *core,
-		uint32_t drp_port,
+int32_t xilinx_xcvr_gtx2_qpll_write_config(xcvr_core *core, uint32_t drp_port,
 		const struct xilinx_xcvr_qpll_config *conf);
 
-int32_t xilinx_xcvr_gth34_qpll_write_config(xcvr_core *core,
-		uint32_t drp_port,
+int32_t xilinx_xcvr_gth34_qpll_write_config(xcvr_core *core, uint32_t drp_port,
 		const struct xilinx_xcvr_qpll_config *conf);
 
-int32_t xilinx_xcvr_qpll_write_config(xcvr_core *core,
-				      uint32_t drp_port,
-				      const struct xilinx_xcvr_qpll_config *conf);
+int32_t xilinx_xcvr_qpll_write_config(xcvr_core *core, uint32_t drp_port,
+		const struct xilinx_xcvr_qpll_config *conf);
 
-uint32_t xilinx_xcvr_qpll_calc_lane_rate(xcvr_core *core,
-		uint32_t refclk_hz,
-		const struct xilinx_xcvr_qpll_config *conf,
-		uint32_t out_div);
+uint32_t xilinx_xcvr_qpll_calc_lane_rate(xcvr_core *core, uint32_t refclk_hz,
+		const struct xilinx_xcvr_qpll_config *conf, uint32_t out_div);
 
 #endif
 #endif

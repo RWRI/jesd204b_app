@@ -114,10 +114,7 @@
 /*************************** Types Declarations *******************************/
 /******************************************************************************/
 typedef enum {
-	DAC_SRC_DDS,
-	DAC_SRC_SED,
-	DAC_SRC_DMA,
-	DAC_SRC_ZERO,	// Output 0
+	DAC_SRC_DDS, DAC_SRC_SED, DAC_SRC_DMA, DAC_SRC_ZERO,	// Output 0
 	DAC_SRC_PN7,
 	DAC_SRC_PN15,
 	DAC_SRC_PN23,
@@ -128,20 +125,20 @@ typedef enum {
 
 typedef struct {
 	uint32_t dds_frequency_0;       // in hz (1000*1000 for MHz)
-	uint32_t dds_phase_0;           // in milli(?) angles (90*1000 for 90 degrees = pi/2)
+	uint32_t dds_phase_0;  // in milli(?) angles (90*1000 for 90 degrees = pi/2)
 	int32_t dds_scale_0;            // in micro units (1.0*1000*1000 is 1.0)
 	uint32_t dds_frequency_1;       // in hz (1000*1000 for MHz)
-	uint32_t dds_phase_1;           // in milli(?) angles (90*1000 for 90 degrees = pi/2)
+	uint32_t dds_phase_1;  // in milli(?) angles (90*1000 for 90 degrees = pi/2)
 	int32_t dds_scale_1;            // in micro units (1.0*1000*1000 is 1.0)
-	uint32_t dds_dual_tone;         // if using single tone for this channel, set to 0x0
+	uint32_t dds_dual_tone; // if using single tone for this channel, set to 0x0
 	uint32_t pat_data;              // if using SED/debug that sort of thing
 	dac_data_src sel;               // set to one of the enumerated type above.
 } dac_channel;
 
 typedef struct {
 	uint32_t base_address;
-	uint8_t	 resolution;
-	uint8_t	 no_of_channels;
+	uint8_t resolution;
+	uint8_t no_of_channels;
 	dac_channel *channels;
 } dac_core;
 

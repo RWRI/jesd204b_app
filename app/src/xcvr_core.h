@@ -54,26 +54,22 @@ typedef enum {
 	PM_300,
 	PM_500,
 	PM_1000,
-} xilinx_xcvr_refclk_ppm;
+}xilinx_xcvr_refclk_ppm;
 
 struct fpga_dev {
-	xcvr_pll		link_pll;
-	xcvr_pll		atx_pll;
-	xcvr_pll		channel_pll[8];	// max 8
+	xcvr_pll link_pll;
+	xcvr_pll atx_pll;
+	xcvr_pll channel_pll[8];	// max 8
 };
 #endif
 
 #ifdef XILINX
 typedef enum {
-	PM_200,
-	PM_700,
-	PM_1250,
+	PM_200, PM_700, PM_1250,
 } xilinx_xcvr_refclk_ppm;
 
 typedef enum {
-	XILINX_XCVR_TYPE_S7_GTX2,
-	XILINX_XCVR_TYPE_US_GTH3,
-	XILINX_XCVR_TYPE_US_GTH4,
+	XILINX_XCVR_TYPE_S7_GTX2, XILINX_XCVR_TYPE_US_GTH3, XILINX_XCVR_TYPE_US_GTH4,
 } xilinx_xcvr_type;
 
 struct xilinx_xcvr_qpll_config {
@@ -89,25 +85,25 @@ struct xilinx_xcvr_cpll_config {
 };
 
 struct fpga_dev {
-	uint32_t			   sys_clk_sel;
-	uint32_t			   out_clk_sel;
-	uint32_t			   out_div;
-	uint8_t				   lpm_enable;
-	uint8_t				   cpll_enable;
-	xilinx_xcvr_type	   type;
+	uint32_t sys_clk_sel;
+	uint32_t out_clk_sel;
+	uint32_t out_div;
+	uint8_t lpm_enable;
+	uint8_t cpll_enable;
+	xilinx_xcvr_type type;
 };
 #endif
 
 typedef struct {
-	uint8_t				   num_lanes;
-	uint8_t				   rx_tx_n;
-	uint32_t			   base_address;
+	uint8_t num_lanes;
+	uint8_t rx_tx_n;
+	uint32_t base_address;
 	xilinx_xcvr_refclk_ppm ppm;
-	uint16_t			   encoding;
-	uint32_t			   lane_rate_kbps;
-	uint32_t			   ref_rate_khz;
-	uint8_t				   reconfig_bypass;
-	struct fpga_dev		   dev;
+	uint16_t encoding;
+	uint32_t lane_rate_kbps;
+	uint32_t ref_rate_khz;
+	uint8_t reconfig_bypass;
+	struct fpga_dev dev;
 } xcvr_core;
 
 /******************************************************************************/
@@ -197,12 +193,11 @@ int32_t xcvr_write(xcvr_core *core, uint32_t reg_addr, uint32_t reg_data);
 #ifdef XILINX
 
 int32_t xcvr_drp_wait_idle(xcvr_core *core, uint32_t drp_addr);
-int32_t xilinx_xcvr_drp_read(xcvr_core *core,
-			     uint32_t drp_port,uint32_t reg);
+int32_t xilinx_xcvr_drp_read(xcvr_core *core, uint32_t drp_port, uint32_t reg);
 int32_t xilinx_xcvr_drp_write(xcvr_core *core, uint32_t drp_port, uint32_t reg,
-			      uint32_t val);
+		uint32_t val);
 int32_t xcvr_drp_update(xcvr_core *core, uint32_t drp_port, uint32_t reg,
-			uint32_t mask, uint32_t val);
+		uint32_t mask, uint32_t val);
 
 #endif
 

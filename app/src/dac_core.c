@@ -45,17 +45,14 @@
 /***************************************************************************//**
  * @brief dac_read
  *******************************************************************************/
-int32_t dac_read(dac_core *core,
-		uint32_t reg_addr,
-		uint32_t *reg_data)
-{
+int32_t dac_read(dac_core *core, uint32_t reg_addr, uint32_t *reg_data) {
 //	*reg_data = ad_reg_read((core->base_address + 0x4000 + reg_addr));
 	*reg_data = ad_reg_read((core->base_address + reg_addr));
 
 	if (*reg_data == 0xDEADDEAD) {
-		#ifdef DEBUG
-			ad_printf("dac_read faild for register: %x", reg_addr);
-		#endif
+#ifdef DEBUG
+		ad_printf("dac_read faild for register: %x", reg_addr);
+#endif
 		return -1;
 	} else {
 		return 0;
@@ -65,17 +62,14 @@ int32_t dac_read(dac_core *core,
 /***************************************************************************//**
  * @brief dac_write
  *******************************************************************************/
-int32_t dac_write(dac_core *core,
-		uint32_t reg_addr,
-		uint32_t reg_data)
-{
+int32_t dac_write(dac_core *core, uint32_t reg_addr, uint32_t reg_data) {
 //	ad_reg_write((core->base_address + 0x4000 + reg_addr), reg_data);
 	ad_reg_write((core->base_address + reg_addr), reg_data);
 
-		#ifdef DEBUG
-			uint32_t reg_data_r;
-			return dac_read(core, reg_addr, &reg_data_r);
-		#endif
+#ifdef DEBUG
+	uint32_t reg_data_r;
+	return dac_read(core, reg_addr, &reg_data_r);
+#endif
 
 	return 0;
 }
@@ -85,16 +79,14 @@ int32_t dac_write(dac_core *core,
  *******************************************************************************/
 
 // freq is in Hz (i.e. set to 1*1000*1000 for 1 MHz)
-
-int32_t dds_set_frequency(dac_core *core, uint32_t chan, uint32_t freq)
-{
+int32_t dds_set_frequency(dac_core *core, uint32_t chan, uint32_t freq) {
 	uint32_t val;
 	uint64_t val64;
 	uint32_t reg;
 	uint64_t dac_clk;
 
 	dac_read(core, DAC_REG_CLK_FREQ, &val);
-	dac_clk = val * ((100*1000*1000)/65535);
+	dac_clk = val * ((100 * 1000 * 1000) / 65535);
 	dac_read(core, DAC_REG_CLK_RATIO, &val);
 	dac_clk *= val;
 
@@ -114,9 +106,7 @@ int32_t dds_set_frequency(dac_core *core, uint32_t chan, uint32_t freq)
  *******************************************************************************/
 
 // phase is in milli(?) angles scaled to 1000 (i.e. 90*1000 is 90 degrees (pi/2))
-
-int32_t dds_set_phase(dac_core *core, uint32_t chan, uint32_t phase)
-{
+int32_t dds_set_phase(dac_core *core, uint32_t chan, uint32_t phase) {
 	uint64_t val64;
 	uint32_t reg;
 
@@ -139,9 +129,7 @@ int32_t dds_set_phase(dac_core *core, uint32_t chan, uint32_t phase)
 // scale range is (-1.99 to +1.99) - hardware supports -2.0, but we ignore it.
 // do not get fancy, above 1.0 (or below -1.0) will mess the dds tones.
 // dds always runs 16bits-- so unless your data path handles it- stay within -1 to +1.
-
-int32_t dds_set_scale(dac_core *core, uint32_t chan, int32_t scale_micro_units)
-{
+int32_t dds_set_scale(dac_core *core, uint32_t chan, int32_t scale_micro_units) {
 	uint32_t pcore_version;
 	uint32_t scale_reg;
 
@@ -150,10 +138,10 @@ int32_t dds_set_scale(dac_core *core, uint32_t chan, int32_t scale_micro_units)
 	// only ise projects support binary shift scaling, if you think you need
 	// this supported in this driver, let us know.
 
-	if (DAC_PCORE_VERSION_MAJOR(pcore_version) < 6)
-	{
-		ad_printf("%s ERROR: Sorry, binary scale is NOT supported!\n", __func__);
-		return(-1);
+	if (DAC_PCORE_VERSION_MAJOR(pcore_version) < 6) {
+		ad_printf("%s ERROR: Sorry, binary scale is NOT supported!\n",
+				__func__);
+		return (-1);
 	}
 
 	scale_reg = scale_micro_units;
@@ -161,22 +149,21 @@ int32_t dds_set_scale(dac_core *core, uint32_t chan, int32_t scale_micro_units)
 		scale_reg = scale_micro_units * -1;
 	if (scale_reg >= 1999000)
 		scale_reg = 1999000;
-	scale_reg = (uint32_t)(((uint64_t)scale_reg * 0x4000) / 1000000);
+	scale_reg = (uint32_t) (((uint64_t) scale_reg * 0x4000) / 1000000);
 	if (scale_micro_units < 0)
 		scale_reg = scale_reg | 0x8000;
 
 	dac_write(core, DAC_REG_SYNC_CONTROL, 0);
 	dac_write(core, DAC_REG_DDS_SCALE(chan), DAC_DDS_SCALE(scale_reg));
 	dac_write(core, DAC_REG_SYNC_CONTROL, DAC_SYNC);
-	return(0);
+	return (0);
 }
 
 /***************************************************************************//**
  * @brief dac_data_src_sel
  *******************************************************************************/
 
-int32_t dac_data_src_sel(dac_core *core, int32_t chan, dac_data_src src)
-{
+int32_t dac_data_src_sel(dac_core *core, int32_t chan, dac_data_src src) {
 	uint32_t pcore_version;
 	uint32_t reg;
 	int32_t i;
@@ -185,31 +172,28 @@ int32_t dac_data_src_sel(dac_core *core, int32_t chan, dac_data_src src)
 
 	// single core control for all channels
 
-	if (DAC_PCORE_VERSION_MAJOR(pcore_version) < 7)
-	{
+	if (DAC_PCORE_VERSION_MAJOR(pcore_version) < 7) {
 		dac_read(core, DAC_REG_DATA_CONTROL, &reg);
 		reg = (reg & ~DAC_DATA_SEL(~0)) | DAC_DATA_SEL(src);
 		dac_write(core, DAC_REG_DATA_CONTROL, reg);
-		return(0);
+		return (0);
 	}
 
 	// per channel source select
 
-	for (i = 0; i < (core->no_of_channels * 2); i++)
-	{
+	for (i = 0; i < (core->no_of_channels * 2); i++) {
 		if ((chan < 0) || (chan == i))
 			dac_write(core, DAC_REG_DATA_SELECT(i), src);
 	}
 	dac_write(core, DAC_REG_SYNC_CONTROL, DAC_SYNC);
 
-	return(0);
+	return (0);
 }
 
 /***************************************************************************//**
  * @brief dac_setup
  *******************************************************************************/
-int32_t dac_setup(dac_core *core)
-{
+int32_t dac_setup(dac_core *core) {
 	uint32_t reg_data;
 	uint32_t dac_clock;
 
@@ -238,34 +222,29 @@ int32_t dac_setup(dac_core *core)
  * @brief dac_setup
  *******************************************************************************/
 
-int32_t dac_data_setup(dac_core *core)
-{
+int32_t dac_data_setup(dac_core *core) {
 	dac_channel *chan;
 	uint32_t i;
 
 	for (i = 0; i < core->no_of_channels; i++) {
 		chan = &core->channels[i];
-		if (chan->sel == DAC_SRC_DDS)
-		{
-			dds_set_frequency(core, ((i*2)+0), chan->dds_frequency_0);
-			dds_set_phase(core, ((i*2)+0), chan->dds_phase_0);
-			dds_set_scale(core, ((i*2)+0), chan->dds_scale_0);
-			if (chan->dds_dual_tone == 0)
-			{
-				dds_set_frequency(core, ((i*2)+1), chan->dds_frequency_0);
-				dds_set_phase(core, ((i*2)+1), chan->dds_phase_0);
-				dds_set_scale(core, ((i*2)+1), chan->dds_scale_0);
-			}
-			else
-			{
-				dds_set_frequency(core, ((i*2)+1), chan->dds_frequency_1);
-				dds_set_phase(core, ((i*2)+1), chan->dds_phase_1);
-				dds_set_scale(core, ((i*2)+1), chan->dds_scale_1);
+		if (chan->sel == DAC_SRC_DDS) {
+			dds_set_frequency(core, ((i * 2) + 0), chan->dds_frequency_0);
+			dds_set_phase(core, ((i * 2) + 0), chan->dds_phase_0);
+			dds_set_scale(core, ((i * 2) + 0), chan->dds_scale_0);
+			if (chan->dds_dual_tone == 0) {
+				dds_set_frequency(core, ((i * 2) + 1), chan->dds_frequency_0);
+				dds_set_phase(core, ((i * 2) + 1), chan->dds_phase_0);
+				dds_set_scale(core, ((i * 2) + 1), chan->dds_scale_0);
+			} else {
+				dds_set_frequency(core, ((i * 2) + 1), chan->dds_frequency_1);
+				dds_set_phase(core, ((i * 2) + 1), chan->dds_phase_1);
+				dds_set_scale(core, ((i * 2) + 1), chan->dds_scale_1);
 			}
 		}
 		dac_write(core, DAC_REG_DATA_PATTERN(i), chan->pat_data);
 		dac_data_src_sel(core, i, chan->sel);
 	}
 
-	return(0);
+	return (0);
 }

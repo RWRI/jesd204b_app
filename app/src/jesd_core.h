@@ -135,24 +135,23 @@
 /******************************************************************************/
 
 typedef enum {
-	EXTERN,
-	INTERN
+	EXTERN, INTERN
 } sys_ref_type;
 
 typedef struct {
-  uint32_t		base_address;
-  uint8_t		rx_tx_n;
-  uint8_t		scramble_enable;
-  uint8_t		lanes_per_device;
-  uint8_t		octets_per_frame;
-  uint8_t		frames_per_multiframe;
-  uint8_t		converters_per_device;
-  uint8_t		resolution;
-  uint8_t		bits_per_sample;
-  uint8_t		high_density;
-  uint8_t		subclass_mode;
-  sys_ref_type		sysref_type;
-  uint32_t		sysref_gpio_pin;
+	uint32_t base_address;
+	uint8_t rx_tx_n;
+	uint8_t scramble_enable;
+	uint8_t lanes_per_device;
+	uint8_t octets_per_frame;
+	uint8_t frames_per_multiframe;
+	uint8_t converters_per_device;
+	uint8_t resolution;
+	uint8_t bits_per_sample;
+	uint8_t high_density;
+	uint8_t subclass_mode;
+	sys_ref_type sysref_type;
+	uint32_t sysref_gpio_pin;
 } jesd_core;
 
 /******************************************************************************/

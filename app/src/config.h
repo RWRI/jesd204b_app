@@ -2,7 +2,7 @@
  *   @file   config.h
  *   @brief  Config file of AD9361/API Driver.
  *   @author DBogdan (dragos.bogdan@analog.com)
-********************************************************************************
+ ********************************************************************************
  * Copyright 2015(c) Analog Devices, Inc.
  *
  * All rights reserved.
@@ -35,7 +35,7 @@
  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************/
+ *******************************************************************************/
 
 #ifndef CONFIG_H_
 #define CONFIG_H_
@@ -46,31 +46,30 @@
 /******************************************************************************/
 /****************************** Carrier Vendors *******************************/
 /******************************************************************************/
- #define XILINX
+#define XILINX
 // #define ALTERA
 
 /******************************************************************************/
 /********************************* CPU Arch ***********************************/
 /******************************************************************************/
 /*Xilinx*/
- #define ZYNQ /* Requires a family definition (below)*/
-	//#define ZYNQ_PS7
-	#define ZYNQ_PSU
+#define ZYNQ /* Requires a family definition (below)*/
+//#define ZYNQ_PS7
+#define ZYNQ_PSU
 // #define MICROBLAZE
 
 /*Altera*/
 // #define SOC
 // #define NIOS_II
-
 /******************************************************************************/
 /********************************* Warn User **********************************/
 /******************************************************************************/
 
 #if !defined(XILINX) && !defined(ALTERA)
-	printf("\nWARNING no vendor defined in config.h (for carrier)\n");
+printf("\nWARNING no vendor defined in config.h (for carrier)\n");
 #endif
 
 #if !defined(MICROBLAZE) && !defined(NIOS_II) && !defined(SOC) && !defined(ZYNQ)
-	printf("\nWARNING CPU arch defined in config.h\n");
+printf("\nWARNING CPU arch defined in config.h\n");
 #endif
 #endif

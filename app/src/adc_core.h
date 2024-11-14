@@ -116,34 +116,22 @@ enum adc_pn_sel {
 
 typedef struct {
 	uint32_t base_address;
-	uint8_t	 master;
-	uint8_t	 no_of_channels;
-	uint8_t	 resolution;
+	uint8_t master;
+	uint8_t no_of_channels;
+	uint8_t resolution;
 } adc_core;
 
 /******************************************************************************/
 /************************ Functions Declarations ******************************/
 /******************************************************************************/
-int32_t adc_read(adc_core core,
-		uint32_t reg_addr,
-		uint32_t *reg_data);
-int32_t adc_write(adc_core core,
-		uint32_t reg_addr,
-		uint32_t reg_data);
-uint32_t adc_delay_calibrate(adc_core core,
-		uint32_t no_of_lanes,
+int32_t adc_read(adc_core core, uint32_t reg_addr, uint32_t *reg_data);
+int32_t adc_write(adc_core core, uint32_t reg_addr, uint32_t reg_data);
+uint32_t adc_delay_calibrate(adc_core core, uint32_t no_of_lanes,
 		enum adc_pn_sel sel);
-uint32_t adc_set_delay(adc_core core,
-		uint32_t no_of_lanes,
-		uint32_t delay);
+uint32_t adc_set_delay(adc_core core, uint32_t no_of_lanes, uint32_t delay);
 int32_t adc_setup(adc_core core);
-int32_t adc_set_pnsel(adc_core core,
-		uint8_t channel,
-		enum adc_pn_sel sel);
-int32_t adc_pn_mon(adc_core core,
-		enum adc_pn_sel sel);
-int32_t adc_ramp_test(adc_core core,
-		uint8_t no_of_cores,
-		uint32_t no_of_samples,
-		uint32_t start_address);
+int32_t adc_set_pnsel(adc_core core, uint8_t channel, enum adc_pn_sel sel);
+int32_t adc_pn_mon(adc_core core, enum adc_pn_sel sel);
+int32_t adc_ramp_test(adc_core core, uint8_t no_of_cores,
+		uint32_t no_of_samples, uint32_t start_address);
 #endif

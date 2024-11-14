@@ -2,7 +2,7 @@
  *   @file   platform_drivers.h
  *   @brief  Header file of Generic Platform Drivers.
  *   @author DBogdan (dragos.bogdan@analog.com)
-********************************************************************************
+ ********************************************************************************
  * Copyright 2017(c) Analog Devices, Inc.
  *
  * All rights reserved.
@@ -35,7 +35,7 @@
  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************/
+ *******************************************************************************/
 
 #ifndef PLATFORM_DRIVERS_H_
 #define PLATFORM_DRIVERS_H_
@@ -96,7 +96,6 @@
 /******************************************************************************/
 
 // data types using stdint-
-
 #ifdef ALTERA
 #define int8_t alt_8
 #define int32_t alt_32
@@ -204,54 +203,48 @@ typedef enum {
 } i2c_type;
 
 typedef struct {
-	i2c_type	type;
-	uint32_t	id;
-	uint32_t	max_speed_hz;
-	uint8_t		slave_address;
+	i2c_type type;
+	uint32_t id;
+	uint32_t max_speed_hz;
+	uint8_t slave_address;
 } i2c_init_param;
 
 typedef struct {
-	i2c_type	type;
-	uint32_t	id;
-	uint32_t	max_speed_hz;
-	uint8_t		slave_address;
+	i2c_type type;
+	uint32_t id;
+	uint32_t max_speed_hz;
+	uint8_t slave_address;
 } i2c_desc;
 
 typedef enum {
-	ZYNQ_PS7_SPI,
-	ZYNQ_PSU_SPI,
-	MICROBLAZE_SPI,
-	NIOS_II_SPI
+	ZYNQ_PS7_SPI, ZYNQ_PSU_SPI, MICROBLAZE_SPI, NIOS_II_SPI
 } spi_type;
 
 typedef struct {
-	spi_type	type;
-	uint8_t     chip_select;
-	uint32_t    cpha;
-	uint32_t    cpol;
+	spi_type type;
+	uint8_t chip_select;
+	uint32_t cpha;
+	uint32_t cpol;
 } spi_init_param;
 
 typedef struct {
-	spi_type	type;
-	uint32_t	id;
-	uint32_t    base_address;
-	uint32_t    device_id;
-	uint8_t     chip_select;
-	uint32_t    cpha;
-	uint32_t    cpol;
+	spi_type type;
+	uint32_t id;
+	uint32_t base_address;
+	uint32_t device_id;
+	uint8_t chip_select;
+	uint32_t cpha;
+	uint32_t cpol;
 } spi_desc;
 
 typedef enum {
-	ZYNQ_PS7_GPIO,
-	ZYNQ_PSU_GPIO,
-	MICROBLAZE_GPIO,
-	NIOS_II_GPIO
+	ZYNQ_PS7_GPIO, ZYNQ_PSU_GPIO, MICROBLAZE_GPIO, NIOS_II_GPIO
 } gpio_type;
 
 typedef struct {
-	gpio_type	type;
-	uint32_t	id;
-	uint8_t		number;
+	gpio_type type;
+	uint32_t id;
+	uint8_t number;
 } gpio_desc;
 
 /******************************************************************************/
@@ -259,39 +252,30 @@ typedef struct {
 /******************************************************************************/
 
 /* Initialize the I2C communication peripheral. */
-int32_t i2c_init(i2c_desc **desc,
-		 const i2c_init_param *param);
+int32_t i2c_init(i2c_desc **desc, const i2c_init_param *param);
 
 /* Free the resources allocated by i2c_init(). */
 int32_t i2c_remove(i2c_desc *desc);
 
 /* Write data to a slave device. */
-int32_t i2c_write(i2c_desc *desc,
-		  uint8_t *data,
-		  uint8_t bytes_number,
-		  uint8_t stop_bit);
+int32_t i2c_write(i2c_desc *desc, uint8_t *data, uint8_t bytes_number,
+		uint8_t stop_bit);
 
 /* Read data from a slave device. */
-int32_t i2c_read(i2c_desc *desc,
-		 uint8_t *data,
-		 uint8_t bytes_number,
-		 uint8_t stop_bit);
+int32_t i2c_read(i2c_desc *desc, uint8_t *data, uint8_t bytes_number,
+		uint8_t stop_bit);
 
 /* Initialize the SPI communication peripheral. */
-int32_t spi_init(spi_desc **desc,
-		 const spi_init_param *param);
+int32_t spi_init(spi_desc **desc, const spi_init_param *param);
 
 /* Free the resources allocated by spi_init() */
 int32_t spi_remove(spi_desc *desc);
 
 /* Write and read data to/from SPI. */
-int32_t spi_write_and_read(spi_desc *desc,
-			   uint8_t *data,
-			   uint8_t bytes_number);
+int32_t spi_write_and_read(spi_desc *desc, uint8_t *data, uint8_t bytes_number);
 
 /* Obtain the GPIO decriptor. */
-int32_t gpio_get(gpio_desc **desc,
-		 uint8_t gpio_number);
+int32_t gpio_get(gpio_desc **desc, uint8_t gpio_number);
 
 /* Free the resources allocated by gpio_get() */
 int32_t gpio_remove(gpio_desc *desc);
@@ -300,20 +284,16 @@ int32_t gpio_remove(gpio_desc *desc);
 int32_t gpio_direction_input(gpio_desc *desc);
 
 /* Enable the output direction of the specified GPIO. */
-int32_t gpio_direction_output(gpio_desc *desc,
-			      uint8_t value);
+int32_t gpio_direction_output(gpio_desc *desc, uint8_t value);
 
 /* Get the direction of the specified GPIO. */
-int32_t gpio_get_direction(gpio_desc *desc,
-			   uint8_t *direction);
+int32_t gpio_get_direction(gpio_desc *desc, uint8_t *direction);
 
 /* Set the value of the specified GPIO. */
-int32_t gpio_set_value(gpio_desc *desc,
-		       uint8_t value);
+int32_t gpio_set_value(gpio_desc *desc, uint8_t value);
 
 /* Get the value of the specified GPIO. */
-int32_t gpio_get_value(gpio_desc *desc,
-		       uint8_t *value);
+int32_t gpio_get_value(gpio_desc *desc, uint8_t *value);
 
 int32_t ad_gpio_set_range(uint8_t start_pin, uint8_t num_pins, uint8_t data);
 int32_t ad_gpio_get_range(uint8_t start_pin, uint8_t num_pins, uint32_t *data);
@@ -329,5 +309,4 @@ uint32_t ad_pow2(uint32_t number);
 
 /* Generate miliseconds delay. */
 //void mdelay(uint32_t msecs);
-
 #endif // PLATFORM_DRIVERS_H_

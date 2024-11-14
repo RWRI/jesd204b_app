@@ -46,14 +46,11 @@
 #ifdef XILINX
 
 /*******************************************************************************
-* @brief xilinx_xcvr_calc_cpll_config
-*******************************************************************************/
-int32_t xilinx_xcvr_calc_cpll_config(xcvr_core *core,
-				     uint32_t refclk_khz,
-				     uint32_t lane_rate_khz,
-				     struct xilinx_xcvr_cpll_config *conf,
-				     uint32_t *out_div)
-{
+ * @brief xilinx_xcvr_calc_cpll_config
+ *******************************************************************************/
+int32_t xilinx_xcvr_calc_cpll_config(xcvr_core *core, uint32_t refclk_khz,
+		uint32_t lane_rate_khz, struct xilinx_xcvr_cpll_config *conf,
+		uint32_t *out_div) {
 	uint32_t n1, n2, d, m;
 	uint32_t vco_freq;
 	uint32_t vco_min;
@@ -72,7 +69,6 @@ int32_t xilinx_xcvr_calc_cpll_config(xcvr_core *core,
 	default:
 		return -1;
 	}
-
 
 	for (m = 1; m <= 2; m++) {
 		for (d = 1; d <= 8; d <<= 1) {
@@ -100,19 +96,17 @@ int32_t xilinx_xcvr_calc_cpll_config(xcvr_core *core,
 		}
 	}
 
-	printf("%s: Failed to find matching dividers for %u kHz rate\n",
-	       __func__, lane_rate_khz);
+	printf("%s: Failed to find matching dividers for %u kHz rate\n", __func__,
+			lane_rate_khz);
 
 	return -1;
 }
 
 /***************************************************************************//**
-* @brief xilinx_xcvr_gth34_cpll_read_config
-*******************************************************************************/
-int32_t xilinx_xcvr_gth34_cpll_read_config(xcvr_core *core,
-		uint32_t drp_port,
-		struct xilinx_xcvr_cpll_config *conf)
-{
+ * @brief xilinx_xcvr_gth34_cpll_read_config
+ *******************************************************************************/
+int32_t xilinx_xcvr_gth34_cpll_read_config(xcvr_core *core, uint32_t drp_port,
+		struct xilinx_xcvr_cpll_config *conf) {
 	int val;
 
 	val = xilinx_xcvr_drp_read(core, drp_port, 0x28);
@@ -155,12 +149,10 @@ int32_t xilinx_xcvr_gth34_cpll_read_config(xcvr_core *core,
 }
 
 /***************************************************************************//**
-* @brief xilinx_xcvr_gtx2_cpll_read_config
-*******************************************************************************/
-int32_t xilinx_xcvr_gtx2_cpll_read_config(xcvr_core *core,
-		uint32_t drp_port,
-		struct xilinx_xcvr_cpll_config *conf)
-{
+ * @brief xilinx_xcvr_gtx2_cpll_read_config
+ *******************************************************************************/
+int32_t xilinx_xcvr_gtx2_cpll_read_config(xcvr_core *core, uint32_t drp_port,
+		struct xilinx_xcvr_cpll_config *conf) {
 	int val;
 
 	val = xilinx_xcvr_drp_read(core, drp_port, CPLL_REFCLK_DIV_M_ADDR);
@@ -199,12 +191,10 @@ int32_t xilinx_xcvr_gtx2_cpll_read_config(xcvr_core *core,
 }
 
 /***************************************************************************//**
-* @brief xilinx_xcvr_cpll_read_config
-*******************************************************************************/
-int32_t xilinx_xcvr_cpll_read_config(xcvr_core *core,
-				     uint32_t drp_port,
-				     struct xilinx_xcvr_cpll_config *conf)
-{
+ * @brief xilinx_xcvr_cpll_read_config
+ *******************************************************************************/
+int32_t xilinx_xcvr_cpll_read_config(xcvr_core *core, uint32_t drp_port,
+		struct xilinx_xcvr_cpll_config *conf) {
 	switch (core->dev.type) {
 	case XILINX_XCVR_TYPE_S7_GTX2:
 		return xilinx_xcvr_gtx2_cpll_read_config(core, drp_port, conf);
@@ -219,12 +209,10 @@ int32_t xilinx_xcvr_cpll_read_config(xcvr_core *core,
 }
 
 /***************************************************************************//**
-* @brief xcvr_gtx2_cpll_write_config
-*******************************************************************************/
-int32_t xilinx_xcvr_gtx2_cpll_write_config(xcvr_core *core,
-		uint32_t drp_port,
-		const struct xilinx_xcvr_cpll_config *conf)
-{
+ * @brief xcvr_gtx2_cpll_write_config
+ *******************************************************************************/
+int32_t xilinx_xcvr_gtx2_cpll_write_config(xcvr_core *core, uint32_t drp_port,
+		const struct xilinx_xcvr_cpll_config *conf) {
 	uint32_t val = 0;
 
 	switch (conf->fb_div_N1) {
@@ -267,19 +255,16 @@ int32_t xilinx_xcvr_gtx2_cpll_write_config(xcvr_core *core,
 	}
 
 	return xcvr_drp_update(core, drp_port, CPLL_REFCLK_DIV_M_ADDR,
-			       CPLL_REFCLK_DIV_M_MASK |
-			       CPLL_FB_DIV_45_N1_MASK |
-			       CPLL_FBDIV_N2_MASK,
-			       val);
+	CPLL_REFCLK_DIV_M_MASK |
+	CPLL_FB_DIV_45_N1_MASK |
+	CPLL_FBDIV_N2_MASK, val);
 }
 
 /***************************************************************************//**
-* @brief xcvr_gth34_cpll_write_config
-*******************************************************************************/
-int32_t xilinx_xcvr_gth34_cpll_write_config(xcvr_core *core,
-		uint32_t drp_port,
-		const struct xilinx_xcvr_cpll_config *conf)
-{
+ * @brief xcvr_gth34_cpll_write_config
+ *******************************************************************************/
+int32_t xilinx_xcvr_gth34_cpll_write_config(xcvr_core *core, uint32_t drp_port,
+		const struct xilinx_xcvr_cpll_config *conf) {
 	uint32_t val;
 	int32_t ret;
 
@@ -315,8 +300,7 @@ int32_t xilinx_xcvr_gth34_cpll_write_config(xcvr_core *core,
 		return -1;
 	}
 
-	ret = xcvr_drp_update(core, drp_port, 0x28,
-			      0xff80, val);
+	ret = xcvr_drp_update(core, drp_port, 0x28, 0xff80, val);
 	if (ret)
 		return ret;
 
@@ -333,17 +317,14 @@ int32_t xilinx_xcvr_gth34_cpll_write_config(xcvr_core *core,
 
 	val <<= 11;
 
-	return xcvr_drp_update(core, drp_port, 0x2a,
-			       0xf800, val);
+	return xcvr_drp_update(core, drp_port, 0x2a, 0xf800, val);
 }
 
 /***************************************************************************//**
-* @brief xcvr_cpll_write_config
-*******************************************************************************/
-int32_t xilinx_xcvr_cpll_write_config(xcvr_core *core,
-				      uint32_t drp_port,
-				      const struct xilinx_xcvr_cpll_config *conf)
-{
+ * @brief xcvr_cpll_write_config
+ *******************************************************************************/
+int32_t xilinx_xcvr_cpll_write_config(xcvr_core *core, uint32_t drp_port,
+		const struct xilinx_xcvr_cpll_config *conf) {
 	switch (core->dev.type) {
 	case XILINX_XCVR_TYPE_S7_GTX2:
 		return xilinx_xcvr_gtx2_cpll_write_config(core, drp_port, conf);
@@ -356,29 +337,22 @@ int32_t xilinx_xcvr_cpll_write_config(xcvr_core *core,
 }
 
 /*******************************************************************************
-* @brief xilinx_xcvr_cpll_calc_lane_rate
-*******************************************************************************/
-uint32_t xilinx_xcvr_cpll_calc_lane_rate(xcvr_core *core,
-		uint32_t refclk_hz,
-		const struct xilinx_xcvr_cpll_config *conf,
-		uint32_t out_div)
-{
+ * @brief xilinx_xcvr_cpll_calc_lane_rate
+ *******************************************************************************/
+uint32_t xilinx_xcvr_cpll_calc_lane_rate(xcvr_core *core, uint32_t refclk_hz,
+		const struct xilinx_xcvr_cpll_config *conf, uint32_t out_div) {
 	if (conf->refclk_div == 0 || out_div == 0)
 		return 0;
 
-	return (refclk_hz * conf->fb_div_N1 * conf->fb_div_N2 * 2) /
-	       (conf->refclk_div * out_div);
+	return (refclk_hz * conf->fb_div_N1 * conf->fb_div_N2 * 2)
+			/ (conf->refclk_div * out_div);
 }
 
 /***************************************************************************//**
-* @brief xcvr_configure_cdr
-*******************************************************************************/
-int32_t xilinx_xcvr_gtx2_configure_cdr(xcvr_core *core,
-				       uint32_t drp_port,
-				       uint32_t lane_rate,
-				       uint32_t out_div,
-				       uint8_t lpm_enable)
-{
+ * @brief xcvr_configure_cdr
+ *******************************************************************************/
+int32_t xilinx_xcvr_gtx2_configure_cdr(xcvr_core *core, uint32_t drp_port,
+		uint32_t lane_rate, uint32_t out_div, uint8_t lpm_enable) {
 	uint32_t cfg0, cfg1, cfg2, cfg3, cfg4;
 
 	cfg0 = 0x0020;
@@ -425,7 +399,7 @@ int32_t xilinx_xcvr_gtx2_configure_cdr(xcvr_core *core,
 		switch (out_div) {
 		case 1:
 			if (lpm_enable) {
-				if (lane_rate  > 6600000) {
+				if (lane_rate > 6600000) {
 					if (core->ppm == PM_1250)
 						cfg1 = 0x1020;
 					else
@@ -434,7 +408,7 @@ int32_t xilinx_xcvr_gtx2_configure_cdr(xcvr_core *core,
 					cfg1 = 0x1020;
 				}
 			} else { /* DFE */
-				if (lane_rate  > 6600000) {
+				if (lane_rate > 6600000) {
 					if (core->ppm == PM_1250)
 						cfg1 = 0x1020;
 					else
@@ -471,12 +445,10 @@ int32_t xilinx_xcvr_gtx2_configure_cdr(xcvr_core *core,
 }
 
 /***************************************************************************//**
-* @brief xcvr_gth3_configure_cdr
-*******************************************************************************/
-int32_t xilinx_xcvr_gth3_configure_cdr(xcvr_core *core,
-				       uint32_t drp_port,
-				       uint32_t out_div)
-{
+ * @brief xcvr_gth3_configure_cdr
+ *******************************************************************************/
+int32_t xilinx_xcvr_gth3_configure_cdr(xcvr_core *core, uint32_t drp_port,
+		uint32_t out_div) {
 	/*
 	 * TODO: UltraScale FPGAs Transceivers Wizard should be used for
 	 *	 generating these settings
@@ -486,18 +458,14 @@ int32_t xilinx_xcvr_gth3_configure_cdr(xcvr_core *core,
 }
 
 /***************************************************************************//**
-* @brief xcvr_configure_cdr
-*******************************************************************************/
-int32_t xilinx_xcvr_configure_cdr(xcvr_core *core,
-				  uint32_t drp_port,
-				  uint32_t lane_rate,
-				  uint32_t out_div,
-				  uint8_t lpm_enable)
-{
+ * @brief xcvr_configure_cdr
+ *******************************************************************************/
+int32_t xilinx_xcvr_configure_cdr(xcvr_core *core, uint32_t drp_port,
+		uint32_t lane_rate, uint32_t out_div, uint8_t lpm_enable) {
 	switch (core->dev.type) {
 	case XILINX_XCVR_TYPE_S7_GTX2:
 		return xilinx_xcvr_gtx2_configure_cdr(core, drp_port, lane_rate,
-						      out_div, lpm_enable);
+				out_div, lpm_enable);
 	case XILINX_XCVR_TYPE_US_GTH3:
 	case XILINX_XCVR_TYPE_US_GTH4:
 		return xilinx_xcvr_gth3_configure_cdr(core, drp_port, out_div);
@@ -507,12 +475,10 @@ int32_t xilinx_xcvr_configure_cdr(xcvr_core *core,
 }
 
 /***************************************************************************//**
-* @brief xcvr_configure_lpm_dfe_mode
-*******************************************************************************/
-int32_t xilinx_xcvr_configure_lpm_dfe_mode(xcvr_core *core,
-		uint32_t drp_port,
-		uint8_t lpm)
-{
+ * @brief xcvr_configure_lpm_dfe_mode
+ *******************************************************************************/
+int32_t xilinx_xcvr_configure_lpm_dfe_mode(xcvr_core *core, uint32_t drp_port,
+		uint8_t lpm) {
 	switch (core->dev.type) {
 	case XILINX_XCVR_TYPE_US_GTH3:
 	case XILINX_XCVR_TYPE_US_GTH4:
@@ -533,10 +499,9 @@ int32_t xilinx_xcvr_configure_lpm_dfe_mode(xcvr_core *core,
 }
 
 /***************************************************************************//**
-* @brief xcvr_out_div_to_val
-*******************************************************************************/
-uint32_t xilinx_xcvr_out_div_to_val(uint32_t out_div)
-{
+ * @brief xcvr_out_div_to_val
+ *******************************************************************************/
+uint32_t xilinx_xcvr_out_div_to_val(uint32_t out_div) {
 	switch (out_div) {
 	case 1:
 		return 0;
@@ -552,13 +517,10 @@ uint32_t xilinx_xcvr_out_div_to_val(uint32_t out_div)
 }
 
 /***************************************************************************//**
-* @brief xilinx_xcvr_gth34_read_out_div
-*******************************************************************************/
-int32_t xilinx_xcvr_gth34_read_out_div(xcvr_core *core,
-				       uint32_t drp_port,
-				       uint32_t *rx_out_div,
-				       uint32_t *tx_out_div)
-{
+ * @brief xilinx_xcvr_gth34_read_out_div
+ *******************************************************************************/
+int32_t xilinx_xcvr_gth34_read_out_div(xcvr_core *core, uint32_t drp_port,
+		uint32_t *rx_out_div, uint32_t *tx_out_div) {
 	int ret;
 
 	if (rx_out_div) {
@@ -581,13 +543,10 @@ int32_t xilinx_xcvr_gth34_read_out_div(xcvr_core *core,
 }
 
 /***************************************************************************//**
-* @brief xilinx_xcvr_gtx2_read_out_div
-*******************************************************************************/
-int32_t xilinx_xcvr_gtx2_read_out_div(xcvr_core *core,
-				      uint32_t drp_port,
-				      uint32_t *rx_out_div,
-				      uint32_t *tx_out_div)
-{
+ * @brief xilinx_xcvr_gtx2_read_out_div
+ *******************************************************************************/
+int32_t xilinx_xcvr_gtx2_read_out_div(xcvr_core *core, uint32_t drp_port,
+		uint32_t *rx_out_div, uint32_t *tx_out_div) {
 	int ret;
 
 	ret = xilinx_xcvr_drp_read(core, drp_port, OUT_DIV_ADDR);
@@ -603,34 +562,28 @@ int32_t xilinx_xcvr_gtx2_read_out_div(xcvr_core *core,
 }
 
 /***************************************************************************//**
-* @brief xilinx_xcvr_read_out_div
-*******************************************************************************/
-int32_t xilinx_xcvr_read_out_div(xcvr_core *core,
-				 uint32_t drp_port,
-				 uint32_t *rx_out_div,
-				 uint32_t *tx_out_div)
-{
+ * @brief xilinx_xcvr_read_out_div
+ *******************************************************************************/
+int32_t xilinx_xcvr_read_out_div(xcvr_core *core, uint32_t drp_port,
+		uint32_t *rx_out_div, uint32_t *tx_out_div) {
 	switch (core->dev.type) {
 	case XILINX_XCVR_TYPE_S7_GTX2:
-		return xilinx_xcvr_gtx2_read_out_div(core, drp_port,
-						     rx_out_div, tx_out_div);
+		return xilinx_xcvr_gtx2_read_out_div(core, drp_port, rx_out_div,
+				tx_out_div);
 	case XILINX_XCVR_TYPE_US_GTH3:
 	case XILINX_XCVR_TYPE_US_GTH4:
-		return xilinx_xcvr_gth34_read_out_div(core, drp_port,
-						      rx_out_div, tx_out_div);
+		return xilinx_xcvr_gth34_read_out_div(core, drp_port, rx_out_div,
+				tx_out_div);
 	default:
 		return -1;
 	}
 }
 
 /***************************************************************************//**
-* @brief xcvr_gtx2_write_out_div
-*******************************************************************************/
-int32_t xilinx_xcvr_gtx2_write_out_div(xcvr_core *core,
-				       uint32_t drp_port,
-				       int32_t rx_out_div,
-				       int32_t tx_out_div)
-{
+ * @brief xcvr_gtx2_write_out_div
+ *******************************************************************************/
+int32_t xilinx_xcvr_gtx2_write_out_div(xcvr_core *core, uint32_t drp_port,
+		int32_t rx_out_div, int32_t tx_out_div) {
 	uint32_t val = 0;
 	uint32_t mask = 0;
 
@@ -647,24 +600,21 @@ int32_t xilinx_xcvr_gtx2_write_out_div(xcvr_core *core,
 }
 
 /***************************************************************************//**
-* @brief xcvr_gth34_write_out_div
-*******************************************************************************/
-int32_t xilinx_xcvr_gth34_write_out_div(xcvr_core *core,
-					uint32_t drp_port,
-					int32_t rx_out_div,
-					int32_t tx_out_div)
-{
+ * @brief xcvr_gth34_write_out_div
+ *******************************************************************************/
+int32_t xilinx_xcvr_gth34_write_out_div(xcvr_core *core, uint32_t drp_port,
+		int32_t rx_out_div, int32_t tx_out_div) {
 	int32_t ret;
 
 	if (rx_out_div >= 0) {
 		ret = xcvr_drp_update(core, drp_port, 0x63, 0x7,
-				      xilinx_xcvr_out_div_to_val(rx_out_div));
+				xilinx_xcvr_out_div_to_val(rx_out_div));
 		if (ret)
 			return ret;
 	}
 	if (tx_out_div >= 0) {
 		ret = xcvr_drp_update(core, drp_port, 0x7c, 0x700,
-				      xilinx_xcvr_out_div_to_val(tx_out_div) << 8);
+				xilinx_xcvr_out_div_to_val(tx_out_div) << 8);
 		if (ret)
 			return ret;
 	}
@@ -673,33 +623,28 @@ int32_t xilinx_xcvr_gth34_write_out_div(xcvr_core *core,
 }
 
 /***************************************************************************//**
-* @brief xcvr_write_out_div
-*******************************************************************************/
-int32_t xilinx_xcvr_write_out_div(xcvr_core *core,
-				  uint32_t drp_port,
-				  int32_t rx_out_div,
-				  int32_t tx_out_div)
-{
+ * @brief xcvr_write_out_div
+ *******************************************************************************/
+int32_t xilinx_xcvr_write_out_div(xcvr_core *core, uint32_t drp_port,
+		int32_t rx_out_div, int32_t tx_out_div) {
 	switch (core->dev.type) {
 	case XILINX_XCVR_TYPE_S7_GTX2:
-		return xilinx_xcvr_gtx2_write_out_div(core, drp_port,
-						      rx_out_div, tx_out_div);
+		return xilinx_xcvr_gtx2_write_out_div(core, drp_port, rx_out_div,
+				tx_out_div);
 	case XILINX_XCVR_TYPE_US_GTH3:
 	case XILINX_XCVR_TYPE_US_GTH4:
-		return xilinx_xcvr_gth34_write_out_div(core, drp_port,
-						       rx_out_div, tx_out_div);
+		return xilinx_xcvr_gth34_write_out_div(core, drp_port, rx_out_div,
+				tx_out_div);
 	default:
 		return -1;
 	}
 }
 
 /***************************************************************************//**
-* @brief xcvr_write_rx_clk25_div
-*******************************************************************************/
-int32_t xilinx_xcvr_write_rx_clk25_div(xcvr_core *core,
-				       uint32_t drp_port,
-				       uint32_t div)
-{
+ * @brief xcvr_write_rx_clk25_div
+ *******************************************************************************/
+int32_t xilinx_xcvr_write_rx_clk25_div(xcvr_core *core, uint32_t drp_port,
+		uint32_t div) {
 	uint32_t reg, mask;
 
 	if (div == 0 || div > 32)
@@ -727,12 +672,10 @@ int32_t xilinx_xcvr_write_rx_clk25_div(xcvr_core *core,
 }
 
 /***************************************************************************//**
-* @brief xcvr_write_tx_clk25_div
-*******************************************************************************/
-int32_t xilinx_xcvr_write_tx_clk25_div(xcvr_core *core,
-				       uint32_t drp_port,
-				       uint32_t div)
-{
+ * @brief xcvr_write_tx_clk25_div
+ *******************************************************************************/
+int32_t xilinx_xcvr_write_tx_clk25_div(xcvr_core *core, uint32_t drp_port,
+		uint32_t div) {
 	uint32_t reg, mask;
 
 	if (div == 0 || div > 32)
@@ -761,4 +704,4 @@ int32_t xilinx_xcvr_write_tx_clk25_div(xcvr_core *core,
 #endif
 
 /*******************************************************************************
-*******************************************************************************/
+ *******************************************************************************/
