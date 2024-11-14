@@ -80,23 +80,37 @@ enum ad9523_channels {
 	ADC_FPGA_SYSREF,
 };
 
-/***************************************************************************//**
- * @brief main
- ******************************************************************************/
-int main(void) {
-	int n;
-	uint32_t qntAmostras = 131072;
-//	uint32_t qntAmostras = 8192;
+#define XPAR_JESD204B_PHY_SHARED_AXI_AD9144_XCVR_BASEADDR XPAR_JESD204B_PHY_SHARED_BASEADDR
+#define XPAR_JESD204B_PHY_SHARED_AXI_AD9680_XCVR_BASEADDR 0xA0000000
 
+/******************************************************************************/
+/******************************* Global Variables *****************************/
+/******************************************************************************/
+
+struct ad9523_dev *ad9523_device;
+struct ad9144_dev *ad9144_device;
+struct ad9680_dev *ad9680_device;
+
+gpio_desc *clkd_sync;
+gpio_desc *dac_reset;
+gpio_desc *dac_txen;
+gpio_desc *adc_pd;
+
+dmac_core ad9144_dma;
+dmac_core ad9680_dma;
+
+/******************************************************************************/
+/******************************* Global Variables *****************************/
+/******************************************************************************/
+
+int init_jesd204b(int qntAmostras, tmode mode) {
 	spi_init_param ad9523_spi_param;
 	spi_init_param ad9144_spi_param;
 	spi_init_param ad9680_spi_param;
 
-#ifdef ZYNQ_PSU
 	ad9523_spi_param.type = ZYNQ_PSU_SPI;
 	ad9144_spi_param.type = ZYNQ_PSU_SPI;
 	ad9680_spi_param.type = ZYNQ_PSU_SPI;
-#endif
 
 	ad9523_spi_param.chip_select = SPI_CHIP_SELECT(0);
 	ad9144_spi_param.chip_select = SPI_CHIP_SELECT(1);
@@ -118,30 +132,19 @@ int main(void) {
 	ad9144_param.spi_init = ad9144_spi_param;
 	ad9680_param.spi_init = ad9680_spi_param;
 
-	struct ad9523_dev *ad9523_device;
-	struct ad9144_dev *ad9144_device;
-	struct ad9680_dev *ad9680_device;
-
 	dac_core ad9144_core;
 	dac_channel ad9144_channels[2];
 	jesd_core ad9144_jesd;
-	dmac_core ad9144_dma;
 	xcvr_core ad9144_xcvr;
 	adc_core ad9680_core;
 	jesd_core ad9680_jesd;
 	xcvr_core ad9680_xcvr;
-	dmac_core ad9680_dma;
 	dmac_xfer rx_xfer;
 	dmac_xfer tx_xfer;
 
 //******************************************************************************
 // setup the base addresses
 //******************************************************************************
-
-#define XPAR_JESD204B_PHY_SHARED_AXI_AD9144_XCVR_BASEADDR XPAR_JESD204B_PHY_SHARED_BASEADDR
-#define XPAR_JESD204B_PHY_SHARED_AXI_AD9680_XCVR_BASEADDR 0xA0000000 //0xA0010000
-
-#ifdef XILINX
 	ad9144_xcvr.base_address =
 	XPAR_JESD204B_PHY_SHARED_AXI_AD9144_XCVR_BASEADDR;
 	ad9144_core.base_address = XPAR_JESD204B_DAC_AXI_AD9144_TPL_BASEADDR;
@@ -153,25 +156,24 @@ int main(void) {
 	ad9680_jesd.base_address = XPAR_JESD204B_ADC_AXI_AD9680_JESD_BASEADDR;
 	ad9680_dma.base_address =
 	XPAR_JESD204B_ADC_AXI_AD9680_DMA_AXI_DMAC_BASEADDR;
-#endif
 
-#ifdef ZYNQ
-	rx_xfer.start_address = XPAR_DDR_MEM_BASEADDR + 0x800000;
-	tx_xfer.start_address = XPAR_DDR_MEM_BASEADDR + 0x800000;
-//	tx_xfer.start_address = XPAR_DDR_MEM_BASEADDR + 0x900000;
-#endif
+	if (mode == ADC_DAC) {
+		rx_xfer.start_address = XPAR_DDR_MEM_BASEADDR + 0x800000;
+		tx_xfer.start_address = XPAR_DDR_MEM_BASEADDR + 0x800000;
+	} else {
+		rx_xfer.start_address = XPAR_DDR_MEM_BASEADDR + 0x800000;
+		tx_xfer.start_address = XPAR_DDR_MEM_BASEADDR + 0xA00000;
+	}
 
 //******************************************************************************
 // clock distribution device (AD9523) configuration
 //******************************************************************************
-
 	ad9523_pdata.num_channels = 8;
 	ad9523_pdata.channels = &ad9523_channels[0];
 	ad9523_param.pdata = &ad9523_pdata;
 	ad9523_init(&ad9523_param);
 
 	// dac device-clk-sysref, fpga-clk-sysref
-
 	ad9523_channels[DAC_DEVICE_CLK].channel_num = 1;
 	ad9523_channels[DAC_DEVICE_CLK].channel_divider = 1;
 	ad9523_channels[DAC_DEVICE_SYSREF].channel_num = 7;
@@ -182,7 +184,6 @@ int main(void) {
 	ad9523_channels[DAC_FPGA_SYSREF].channel_divider = 128;
 
 	// adc device-clk-sysref, fpga-clk-sysref
-
 	ad9523_channels[ADC_DEVICE_CLK].channel_num = 13;
 	ad9523_channels[ADC_DEVICE_CLK].channel_divider = 1;
 	ad9523_channels[ADC_DEVICE_SYSREF].channel_num = 6;
@@ -193,7 +194,6 @@ int main(void) {
 	ad9523_channels[ADC_FPGA_SYSREF].channel_divider = 128;
 
 	// VCXO 125MHz
-
 	ad9523_pdata.vcxo_freq = 125000000;
 	ad9523_pdata.spi3wire = 1;
 	ad9523_pdata.osc_in_diff_en = 1;
@@ -216,12 +216,9 @@ int main(void) {
 // DAC (AD9144) and the transmit path (AXI_ADXCVR,
 //	JESD204, AXI_AD9144, TX DMAC) configuration
 //******************************************************************************
-
 	xcvr_getconfig(&ad9144_xcvr);
 	ad9144_xcvr.reconfig_bypass = 1;
-#ifdef XILINX
 	ad9144_xcvr.dev.cpll_enable = 0;
-#endif
 	ad9144_xcvr.lane_rate_kbps = 10000000;
 
 	ad9144_jesd.rx_tx_n = 0;
@@ -250,7 +247,7 @@ int main(void) {
 	ad9144_param.jesd204_subclass = 1;
 	ad9144_param.jesd204_scrambling = 1;
 	ad9144_param.jesd204_mode = 4;
-	for (n = 0; n < ARRAY_SIZE(ad9144_param.jesd204_lane_xbar); n++)
+	for (int n = 0; n < ARRAY_SIZE(ad9144_param.jesd204_lane_xbar); n++)
 		ad9144_param.jesd204_lane_xbar[n] = n;
 
 	ad9144_core.no_of_channels = 2;
@@ -278,14 +275,11 @@ int main(void) {
 // ADC (AD9680) and the receive path ( AXI_ADXCVR,
 //	JESD204, AXI_AD9680, TX DMAC) configuration
 //******************************************************************************
-
 	ad9680_param.lane_rate_kbps = 10000000;
 
 	xcvr_getconfig(&ad9680_xcvr);
 	ad9680_xcvr.reconfig_bypass = 1;
-#ifdef XILINX
 	ad9680_xcvr.dev.cpll_enable = 0;
-#endif
 	ad9680_xcvr.rx_tx_n = 1;
 	ad9680_xcvr.lane_rate_kbps = ad9680_param.lane_rate_kbps;
 
@@ -312,20 +306,16 @@ int main(void) {
 	ad9144_dma.transfer = &tx_xfer;
 	ad9144_dma.flags = DMAC_FLAGS_TLAST;
 	tx_xfer.id = 0;
-//	tx_xfer.no_of_samples = dac_buffer_load(ad9144_core, tx_xfer.start_address);
-	tx_xfer.no_of_samples = qntAmostras;
+	if (mode == DAC_DMA)
+		tx_xfer.no_of_samples = dac_buffer_load(ad9144_core,
+				tx_xfer.start_address);
+	else
+		tx_xfer.no_of_samples = qntAmostras;
 
 //******************************************************************************
 // bring up the system
 //******************************************************************************
-
 	// setup GPIOs
-
-	gpio_desc *clkd_sync;
-	gpio_desc *dac_reset;
-	gpio_desc *dac_txen;
-	gpio_desc *adc_pd;
-
 	gpio_get(&clkd_sync, GPIO_CLKD_SYNC);
 	gpio_get(&dac_reset, GPIO_DAC_RESET);
 	gpio_get(&dac_txen, GPIO_DAC_TXEN);
@@ -343,7 +333,6 @@ int main(void) {
 	gpio_set_value(adc_pd, 0);
 
 	// setup clocks
-
 	ad9523_setup(&ad9523_device, &ad9523_param);
 
 	// Recommended DAC JESD204 link startup sequence
@@ -366,8 +355,6 @@ int main(void) {
 	jesd_setup(&ad9144_jesd);
 
 	// ADC and DAC FPGA JESD204 PHY layer
-
-#ifdef XILINX
 	if (!ad9144_xcvr.dev.cpll_enable) {	// DAC_XCVR controls the QPLL reset
 		xcvr_setup(&ad9144_xcvr);
 		xcvr_setup(&ad9680_xcvr);
@@ -375,7 +362,6 @@ int main(void) {
 		xcvr_setup(&ad9680_xcvr);
 		xcvr_setup(&ad9144_xcvr);
 	}
-#endif
 
 	// ADC FPGA JESD204 link layer
 	jesd_setup(&ad9680_jesd);
@@ -396,14 +382,12 @@ int main(void) {
 //******************************************************************************
 // transport path testing
 //******************************************************************************
-
 	ad9144_channels[0].sel = DAC_SRC_SED;
 	ad9144_channels[1].sel = DAC_SRC_SED;
 	dac_data_setup(&ad9144_core);
 	ad9144_short_pattern_test(ad9144_device, &ad9144_param);
 
 	// PN7 data path test
-
 	ad9144_channels[0].sel = DAC_SRC_PN23;
 	ad9144_channels[1].sel = DAC_SRC_PN23;
 	dac_data_setup(&ad9144_core);
@@ -411,7 +395,6 @@ int main(void) {
 	ad9144_datapath_prbs_test(ad9144_device, &ad9144_param);
 
 	// PN15 data path test
-
 	ad9144_channels[0].sel = DAC_SRC_PN31;
 	ad9144_channels[1].sel = DAC_SRC_PN31;
 	dac_data_setup(&ad9144_core);
@@ -421,72 +404,77 @@ int main(void) {
 //******************************************************************************
 // receive path testing
 //******************************************************************************
-
-	ad9680_test(ad9680_device, AD9680_TEST_PN9);//rwri: configura o modo de teste com 2^9 bits
-	if (adc_pn_mon(ad9680_core, ADC_PN9) == -1) { //rwri:chama as funções para configurar e realizar a validação do canal de transmissão
+	ad9680_test(ad9680_device, AD9680_TEST_PN9);
+	if (adc_pn_mon(ad9680_core, ADC_PN9) == -1) {
 		printf("\r%s ad9680 - PN9 sequence mismatch!\n", __func__);
 	} else {
 		printf("\rAD9680_TEST_PN9 success executed!\n");
 	};
-	ad9680_test(ad9680_device, AD9680_TEST_PN23); //rwri: mesmo que o anterior mas agora para o PN23
+	ad9680_test(ad9680_device, AD9680_TEST_PN23);
 	if (adc_pn_mon(ad9680_core, ADC_PN23A) == -1) {
 		printf("\r%s ad9680 - PN23 sequence mismatch!\n", __func__);
 	} else {
 		printf("\rAD9680_TEST_PN23 success executed!\n");
 	};
 
-	// default data
-
-//******************************************************************************
-// external loopback - capture data with DMA
-//******************************************************************************
-
 	ad9680_test(ad9680_device, AD9680_TEST_OFF);
-	if (!dmac_start_transaction(ad9680_dma)) {
-		printf("\rdaq2: RX capture done.\n");
-	};
 
 //******************************************************************************
-// infinite loop for dac
+//  configure final dac mode
 //******************************************************************************
+	if (mode == DAC_DMA || ADC_DAC) {
+		ad9144_channels[0].sel = DAC_SRC_DMA;
+		ad9144_channels[1].sel = DAC_SRC_DMA;
+		dac_data_setup(&ad9144_core);
 
-#if DMA_BUFFER
-	ad9144_channels[0].sel = DAC_SRC_DMA;
-	ad9144_channels[1].sel = DAC_SRC_DMA;
-	dac_data_setup(&ad9144_core);
+		//value of ceil
+		*((uint32_t *) (XPAR_JESD204B_DAC_AXI_GPIO_COUNTER_BASEADDR + 0x8)) =
+				3750000;
 
-	//value of ceil
-	*((uint32_t *) (XPAR_JESD204B_DAC_AXI_GPIO_COUNTER_BASEADDR + 0x8)) =
-			3750000;
-
-	if (!dmac_start_transaction_direct_register_mode(ad9144_dma)) {
-		printf("daq2: transmitting data from memory\n");
-	} else {
-		printf("da2: something went wrong with dac transmit!");
+		printf("dac configure in dma mode\n");
 	}
 
-//	while(1){
-//		dmac_start_transaction_direct_register_mode(ad9144_dma);
-//
-//		dmac_start_transaction(ad9680_dma);
-//
-//		while(!*((uint32_t *)(XPAR_JESD204B_DAC_AXI_GPIO_COUNTER_BASEADDR)));
-//	}
+	if (mode == DAC_DDS) {
+		ad9144_channels[0].sel = DAC_SRC_DDS;
+		ad9144_channels[1].sel = DAC_SRC_DDS;
+		dac_data_setup(&ad9144_core);
 
-	while (1) {
-		transmit_receive(ad9144_dma, ad9680_dma);
-		while (!*((uint32_t *) (XPAR_JESD204B_DAC_AXI_GPIO_COUNTER_BASEADDR)))
-			;
+		printf("dac configure in dds mode\n");
 	}
 
-#else
-	ad9144_channels[0].sel = DAC_SRC_DDS;
-	ad9144_channels[1].sel = DAC_SRC_DDS;
-	dac_data_setup(&ad9144_core);
+//******************************************************************************
+//  configure dmas
+//******************************************************************************
+	dmac_config_transaction(ad9680_dma);
+	dma_config_transaction(ad9144_dma);
 
-	printf("daq2: setup and configuration is done\n");
-#endif
+	return 0;
+}
 
+int adc() {
+	dmac_start_transaction(ad9680_dma);
+	printf("Picked %d samples by ADC\n",
+			ad9680_dma.transfer->no_of_samples);
+
+	return 0;
+}
+
+int dac() {
+	dma_start_transaction(ad9144_dma);
+	while (!*((uint32_t *) (XPAR_JESD204B_DAC_AXI_GPIO_COUNTER_BASEADDR)))
+		;
+
+	return 0;
+}
+int adc_dac() {
+	transmit_receive(ad9144_dma, ad9680_dma);
+	while (!*((uint32_t *) (XPAR_JESD204B_DAC_AXI_GPIO_COUNTER_BASEADDR)))
+		;
+
+	return 0;
+}
+
+int clear_jesd204b() {
 	/* Memory deallocation for devices and spi */
 	ad9144_remove(ad9144_device);
 	ad9523_remove(ad9523_device);
@@ -498,8 +486,8 @@ int main(void) {
 	gpio_remove(dac_txen);
 	gpio_remove(adc_pd);
 
-	printf("\rend of code\n");
+	printf("-------------------------------- end of cycle ---------------------------------\n");
 
 	return 0;
-
 }
+

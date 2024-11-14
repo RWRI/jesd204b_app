@@ -66,10 +66,8 @@ int32_t dmac_write(dmac_core core, uint32_t reg_addr, uint32_t reg_data) {
  * @brief dmac_start_transaction
  *******************************************************************************/
 
-int32_t dmac_start_transaction(dmac_core dma) {
-
+int32_t dmac_config_transaction(dmac_core dma) {
 	uint32_t reg_val = 0;
-	uint32_t timer = 0;
 
 	dmac_write(dma, DMAC_REG_CTRL, 0x0);
 	dmac_write(dma, DMAC_REG_CTRL, DMAC_CTRL_ENABLE);
@@ -99,6 +97,13 @@ int32_t dmac_start_transaction(dmac_core dma) {
 	}
 	dmac_write(dma, DMAC_REG_X_LENGTH, (2 * dma.transfer->no_of_samples) - 1);
 	dmac_write(dma, DMAC_REG_Y_LENGTH, 0x0);
+
+	return 0;
+}
+
+int32_t dmac_start_transaction(dmac_core dma) {
+	uint32_t reg_val = 0;
+	uint32_t timer = 0;
 
 	dmac_write(dma, DMAC_REG_START_TRANSFER, 0x1);
 	if (dma.flags & DMAC_FLAGS_CYCLIC) {
@@ -134,7 +139,7 @@ int32_t dmac_start_transaction(dmac_core dma) {
 	return 0;
 }
 
-int32_t dmac_reset_transaction(dmac_core dma) {
+int32_t dma_reset_transaction(dmac_core dma) {
 	uint32_t reg_val = 0;
 
 	dmac_read(dma, 0x4, &reg_val);
@@ -148,7 +153,7 @@ int32_t dmac_reset_transaction(dmac_core dma) {
 	return 0;
 }
 
-int32_t dmac_start_transaction_direct_register_mode(dmac_core dma) {
+int32_t dma_config_transaction(dmac_core dma) {
 	uint32_t reg_val = 0;
 
 	//start transfer
@@ -158,6 +163,13 @@ int32_t dmac_start_transaction_direct_register_mode(dmac_core dma) {
 
 	//configure source address
 	dmac_write(dma, 0x18, dma.transfer->start_address);
+
+	return 0;
+}
+
+
+int32_t dma_start_transaction(dmac_core dma) {
+	uint32_t reg_val = 0;
 
 	//configure length transfer
 	dmac_write(dma, 0x28, (2 * dma.transfer->no_of_samples) - 1);

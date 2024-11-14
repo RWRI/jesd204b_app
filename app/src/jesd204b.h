@@ -72,4 +72,13 @@ printf("\nWARNING no vendor defined in config.h (for carrier)\n");
 #if !defined(MICROBLAZE) && !defined(NIOS_II) && !defined(SOC) && !defined(ZYNQ)
 printf("\nWARNING CPU arch defined in config.h\n");
 #endif
+
+typedef enum {ADC, DAC_DDS, DAC_DMA, ADC_DAC, END_MODE} tmode;
+
+int init_jesd204b(int qntAmostras, tmode  mode);
+int adc();
+int dac();
+int adc_dac();
+int clear_jesd204b();
+
 #endif

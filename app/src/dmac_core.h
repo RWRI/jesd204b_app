@@ -105,9 +105,11 @@ typedef struct {
 int32_t dmac_read(dmac_core core, uint32_t reg_addr, uint32_t *reg_data);
 int32_t dmac_write(dmac_core core, uint32_t reg_addr, uint32_t reg_data);
 
+int32_t dmac_config_transaction(dmac_core core);
 int32_t dmac_start_transaction(dmac_core core);
-int32_t dmac_start_transaction_direct_register_mode(dmac_core core);
-int32_t dmac_reset_transaction(dmac_core core);
+int32_t dma_config_transaction(dmac_core core);
+int32_t dma_start_transaction(dmac_core core);
+int32_t dma_reset_transaction(dmac_core core);
 int32_t transmit_receive(dmac_core dmat, dmac_core dmar);
 
 #endif
