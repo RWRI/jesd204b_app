@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://pssolucoes.app.br:5055/images/somenteLogo-PS.png" alt="Logo PS Soluções" width="150">
+    <img src="https://cdn.worldvectorlogo.com/logos/unifei-1.svg" alt="Logo UNIFEI" width="150">
     <h1>Aplicação - Códigos Fontes</h1>
 </div>
 
