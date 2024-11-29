@@ -1,9 +1,9 @@
 <div align="center">
-    <img src="https://pssolucoes.app.br:5055/images/somenteLogo-PS.png" alt="Logo PS Soluções" width="150">
+    <img src="https://cdn.worldvectorlogo.com/logos/unifei-1.svg" alt="Logo UNIFEI" width="150">
     <h1>Aplicação Controle JESD204B</h1>
 </div>
 
-Este repositório visa organizar os arquivos referentes a aplicação bare metal de controle do [hardware](https://github.com/rwriPS/jesd204) que implementa o protocolo JESD204B.
+Este repositório faz parte do trabalho final de graduação do curso de Engenharia de Computação da Universidade Federal de Itajubá. Além disso, visa-se organizar os arquivos referentes a aplicação bare metal de controle do [hardware](https://github.com/rwriPS/jesd204) que implementa o protocolo JESD204B.
 
 Assim, ressalta-se que o arquivo [jesd204b.xsa](/jesd204b.xsa) é o binário do hardware desenvolvido. Também, este é o arquivo utilizado para criar a plataforma no Vitis, a qual fornece a base para criar a aplicação de controle.
 
