@@ -3,7 +3,7 @@
     <h1>Aplicação Controle JESD204B</h1>
 </div>
 
-Este repositório faz parte do trabalho final de graduação [Implementação do protocolo JESD204B em plataforma de desenvolvimento Zynq UltraScale+ MPSoc para controle de ADC e DAC de alta velocidade](./monograph.pdf) do curso de Engenharia de Computação da Universidade Federal de Itajubá. Além disso, visa-se organizar os arquivos referentes a aplicação bare metal de controle do [hardware](https://github.com/RWRI/jesd204) que implementa o protocolo JESD204B. Acrescenta-se que este o repositório é licenciado sob a [GPL v2](./LICENSE), exceto por alguns arquivos que possuem licenças diferentes, as quais são definidas em seus cabeçalhos.
+Este repositório faz parte do trabalho final de graduação [Implementação do protocolo JESD204B em plataforma de desenvolvimento Zynq UltraScale+ MPSoc para controle de ADC e DAC de alta velocidade](./monograph.pdf) do curso de Engenharia de Computação da Universidade Federal de Itajubá. Além disso, visa-se organizar os arquivos referentes a aplicação bare metal de controle do [hardware](https://github.com/RWRI/jesd204) que implementa o protocolo JESD204B. Acrescenta-se que este repositório está licenciado sob a [GPL v2](./LICENSE), exceto por alguns arquivos que possuem licenças diferentes, as quais estão definidas em seus respectivos cabeçalhos.
 
 Assim, ressalta-se que o arquivo [jesd204b.xsa](/jesd204b.xsa) é o binário do hardware desenvolvido. Também, este é o arquivo utilizado para criar a plataforma no Vitis, a qual fornece a base para criar a aplicação de controle.
 
